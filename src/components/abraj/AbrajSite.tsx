@@ -914,53 +914,58 @@ function ProjectsSection({ lang, theme }: { lang: Lang; theme: Theme }) {
 /* ---------------- Partners marquee ---------------- */
 function PartnersMarquee({ lang, theme }: { lang: Lang; theme: Theme }) {
   const t = translations[lang].partners;
-  const doubled = useMemo(() => [...PARTNERS, ...PARTNERS], []);
-  const [paused, setPaused] = useState(false);
+  // 4 copies for seamless infinite scroll
+  const quad = useMemo(() => [...PARTNERS, ...PARTNERS, ...PARTNERS, ...PARTNERS], []);
+  // Split into two interleaved rows for visual depth
+  const rowA = useMemo(() => quad.filter((_, i) => i % 2 === 0), [quad]);
+  const rowB = useMemo(() => quad.filter((_, i) => i % 2 === 1), [quad]);
+
+  const Card = ({ p, i }: { p: string; i: number }) => {
+    const meta = PARTNER_META[p] ?? { initials: p.slice(0, 2).toUpperCase(), color: "#1d3fba", bg: "rgba(29,63,186,0.12)" };
+    return (
+      <div
+        key={`${p}-${i}`}
+        className="glass-card flex flex-col items-center justify-center gap-3 px-6 py-5 min-w-[130px] w-[130px] flex-shrink-0"
+      >
+        <div
+          className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black tracking-tight shrink-0 border"
+          style={{ background: meta.bg, color: meta.color, borderColor: `${meta.color}40`, boxShadow: `0 0 12px ${meta.color}22` }}
+        >
+          {meta.initials}
+        </div>
+        <span className={`text-xs font-bold tracking-wide text-center leading-tight ${tc(theme, "text-white/80", "text-[#111111]/75")}`}>{p}</span>
+      </div>
+    );
+  };
+
   return (
     <section id="partners" className="relative py-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <SectionHeader title={t.title} subtitle={t.subtitle} lang={lang} theme={theme} />
-        <div
-          className="relative overflow-hidden mask-fade"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
+      </div>
+
+      {/* Row A — scrolls left */}
+      <div className="relative overflow-hidden mask-fade mb-4">
+        <motion.div
+          className="flex gap-4"
+          style={{ direction: "ltr", width: "max-content" }}
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: 28, ease: "linear", repeat: Infinity, repeatType: "loop" }}
         >
-          <div
-            className="flex gap-5 w-max"
-            style={{
-              direction: "ltr",
-              animation: `marquee 36s linear infinite`,
-              animationPlayState: paused ? "paused" : "running",
-            }}
-          >
-            {doubled.map((p, i) => {
-              const meta = PARTNER_META[p] ?? { initials: p.slice(0, 2).toUpperCase(), color: "#1d3fba", bg: "rgba(29,63,186,0.12)" };
-              return (
-                <div
-                  key={`${p}-${i}`}
-                  className={`glass-card flex flex-col items-center justify-center gap-3 px-6 py-5 min-w-[140px] w-[140px] hover:border-[#1d3fba]/60 hover:blue-glow transition-all cursor-default ${paused ? "hover:scale-[1.03]" : ""}`}
-                >
-                  {/* Logo badge */}
-                  <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black tracking-tight shrink-0 border"
-                    style={{
-                      background: meta.bg,
-                      color: meta.color,
-                      borderColor: `${meta.color}40`,
-                      boxShadow: `0 0 12px ${meta.color}22`,
-                    }}
-                  >
-                    {meta.initials}
-                  </div>
-                  {/* Company name */}
-                  <span className={`text-xs font-bold tracking-wide text-center leading-tight ${tc(theme, "text-white/80", "text-[#111111]/75")}`}>
-                    {p}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+          {rowA.map((p, i) => <Card key={`a-${p}-${i}`} p={p} i={i} />)}
+        </motion.div>
+      </div>
+
+      {/* Row B — scrolls right (offset) */}
+      <div className="relative overflow-hidden mask-fade">
+        <motion.div
+          className="flex gap-4"
+          style={{ direction: "ltr", width: "max-content" }}
+          animate={{ x: ["-50%", "0%"] }}
+          transition={{ duration: 32, ease: "linear", repeat: Infinity, repeatType: "loop" }}
+        >
+          {rowB.map((p, i) => <Card key={`b-${p}-${i}`} p={p} i={i} />)}
+        </motion.div>
       </div>
     </section>
   );
