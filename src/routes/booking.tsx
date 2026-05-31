@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Moon, Sun, ArrowLeft, ArrowRight } from "lucide-react";
+import { Moon, Sun, ArrowLeft, ArrowRight, Home as HomeIcon, AppWindow, Sparkles, Building2, MessageCircle } from "lucide-react";
 import { BookingSection } from "@/components/abraj/BookingSection";
 import { translations, type Lang } from "@/components/abraj/translations";
 import type { Theme } from "@/components/abraj/AbrajSite";
@@ -59,7 +59,7 @@ function BookingPage() {
   return (
     <div
       dir={t.dir}
-      className={`${t.fontClass} ${theme === "day" ? "day-mode" : "night-mode"} transition-colors duration-500 ${tc(theme, "bg-black text-white", "bg-[#f7f8fb] text-[#111111]")} min-h-screen`}
+      className={`${t.fontClass} ${theme === "day" ? "day-mode" : "night-mode"} transition-colors duration-500 ${tc(theme, "bg-black text-white", "bg-[#f7f8fb] text-[#111111]")} min-h-screen pb-20`}
     >
       {/* Top bar */}
       <header
@@ -111,6 +111,36 @@ function BookingPage() {
       </header>
 
       <BookingSection lang={lang} theme={theme} standalone />
+
+      {/* ── Mobile App Bottom Nav ── */}
+      <nav
+        className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t backdrop-blur-2xl ${tc(theme, "bg-[#0a0a0a]/92 border-white/8", "bg-white/95 border-[#1d3fba]/10")}`}
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 8px)" }}
+      >
+        <div className="flex items-end justify-around w-full px-1 pt-2 pb-1">
+          {([
+            { id: "home",     icon: HomeIcon,       label: isAr ? "الرئيسية" : "Home",     href: "/",        active: false },
+            { id: "services", icon: AppWindow,      label: isAr ? "الخدمات"  : "Services", href: "/#services", active: false },
+            { id: "booking",  icon: Sparkles,       label: isAr ? "احجز"     : "Book",     href: "/booking", active: true  },
+            { id: "projects", icon: Building2,      label: isAr ? "المشاريع" : "Projects", href: "/#projects", active: false },
+            { id: "contact",  icon: MessageCircle,  label: isAr ? "تواصل"    : "Contact",  href: "/#contact",  active: false },
+          ] as const).map(({ id, icon: Icon, label, href, active }) =>
+            active ? (
+              <span key={id} className="flex flex-col items-center -translate-y-3">
+                <span className="w-14 h-14 rounded-full bg-[#1d3fba] flex items-center justify-center text-white shadow-xl shadow-[#1d3fba]/40 blue-glow">
+                  <Icon className="w-5 h-5" />
+                </span>
+                <span className="text-[9px] mt-0.5 font-bold text-[#1d3fba]">{label}</span>
+              </span>
+            ) : (
+              <Link key={id} to={href as "/" | "/booking"} className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors active:scale-95 ${tc(theme, "text-white/40 hover:text-white", "text-[#8a95a8] hover:text-[#1d3fba]")}`}>
+                <Icon className="w-5 h-5" />
+                <span className="text-[9px] font-medium">{label}</span>
+              </Link>
+            )
+          )}
+        </div>
+      </nav>
     </div>
   );
 }

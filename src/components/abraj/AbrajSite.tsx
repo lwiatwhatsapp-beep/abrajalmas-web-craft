@@ -12,7 +12,6 @@ import logoSymbol from "@/assets/abraj-logo-symbol.png";
 import logoWhite from "@/assets/abraj-logo-white.png";
 import logoBlack from "@/assets/abraj-logo-black.png";
 import { translations, PARTNERS, PHONES, WA_NUMBER, EMAIL, WEBSITE, type Lang } from "./translations";
-import { BookingSection } from "./BookingSection";
 
 export type Theme = "night" | "day";
 /** Returns night class or day class based on current theme */
@@ -59,6 +58,7 @@ export default function AbrajSite() {
   const [isLoading, setIsLoading] = useState(true);
   const [langKey, setLangKey] = useState(0);
   const t = translations[lang];
+  const isAr = lang === "ar";
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -93,7 +93,7 @@ export default function AbrajSite() {
         transition={{ duration: 0.3, ease: "easeOut" }}
         dir={t.dir}
         lang={lang}
-        className={`${t.fontClass} ${theme === "day" ? "day-mode" : "night-mode"} transition-colors duration-500 ${tc(theme, "bg-black text-white", "bg-[#f7f8fb] text-[#111111]")} min-h-screen overflow-x-hidden`}
+        className={`${t.fontClass} ${theme === "day" ? "day-mode" : "night-mode"} transition-colors duration-500 ${tc(theme, "bg-black text-white", "bg-[#f7f8fb] text-[#111111]")} min-h-screen overflow-x-hidden pb-20 lg:pb-0`}
       >
         <Navbar lang={lang} setLang={handleSetLang} theme={theme} setTheme={setTheme} />
         <Hero lang={lang} theme={theme} />
@@ -106,7 +106,6 @@ export default function AbrajSite() {
         <ServicesSection lang={lang} theme={theme} />
         <ProcessSection lang={lang} theme={theme} />
         <BrandDivider theme={theme} direction="left" />
-        <BookingSection lang={lang} theme={theme} />
         <ProjectsSection lang={lang} theme={theme} />
         <PartnersMarquee lang={lang} theme={theme} />
         <BusinessSolutionsSection lang={lang} theme={theme} />
@@ -114,6 +113,35 @@ export default function AbrajSite() {
         <ContactSection lang={lang} theme={theme} />
         <Footer lang={lang} theme={theme} />
         <FloatingActions lang={lang} theme={theme} />
+        {/* ── Mobile App Bottom Nav ── */}
+        <nav
+          className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t backdrop-blur-2xl ${tc(theme, "bg-[#0a0a0a]/92 border-white/8", "bg-white/95 border-[#1d3fba]/10")}`}
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 8px)" }}
+        >
+          <div className="flex items-end justify-around w-full px-1 pt-2 pb-1">
+            {([
+              { id: "home",     icon: HomeIcon,      label: isAr ? "الرئيسية" : "Home",     href: "#home",     cta: false },
+              { id: "services", icon: AppWindow,     label: isAr ? "الخدمات"  : "Services", href: "#services", cta: false },
+              { id: "booking",  icon: Sparkles,      label: isAr ? "احجز"     : "Book",     href: "/booking", cta: true  },
+              { id: "projects", icon: Building2,     label: isAr ? "المشاريع" : "Projects", href: "#projects", cta: false },
+              { id: "contact",  icon: MessageCircle, label: isAr ? "تواصل"    : "Contact",  href: "#contact",  cta: false },
+            ] as const).map(({ id, icon: Icon, label, href, cta }) =>
+              cta ? (
+                <a key={id} href={href} className="flex flex-col items-center -translate-y-3">
+                  <span className="w-14 h-14 rounded-full bg-[#1d3fba] flex items-center justify-center text-white shadow-xl shadow-[#1d3fba]/40 blue-glow">
+                    <Icon className="w-5 h-5" />
+                  </span>
+                  <span className="text-[9px] mt-0.5 font-bold text-[#1d3fba]">{label}</span>
+                </a>
+              ) : (
+                <a key={id} href={href} className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors active:scale-95 ${tc(theme, "text-white/40 hover:text-white", "text-[#8a95a8] hover:text-[#1d3fba]")}`}>
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[9px] font-medium">{label}</span>
+                </a>
+              )
+            )}
+          </div>
+        </nav>
       </motion.div>
     </>
   );
@@ -1162,7 +1190,7 @@ function FloatingActions({ lang, theme }: { lang: Lang; theme: Theme }) {
   const t = translations[lang].floating;
   return (
     <motion.div
-      className="fixed bottom-5 end-5 z-40 flex flex-col gap-3"
+      className="fixed bottom-24 lg:bottom-5 end-5 z-40 flex flex-col gap-3"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 2.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
