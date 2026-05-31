@@ -35,18 +35,37 @@ export default function AbrajSite() {
     <div dir={t.dir} lang={lang} className={`${t.fontClass} bg-black text-white min-h-screen overflow-x-hidden`}>
       <Navbar lang={lang} setLang={setLang} />
       <Hero lang={lang} />
+      <BrandDivider variant="white" />
       <AboutSection lang={lang} />
       <VisionSection lang={lang} />
       <WhyUsSection lang={lang} />
+      <BrandDivider variant="white" />
       <ServicesSection lang={lang} />
       <ProcessSection lang={lang} />
+      <BrandDivider variant="white" />
       <BookingSection lang={lang} />
       <ProjectsSection lang={lang} />
       <PartnersMarquee lang={lang} />
       <BusinessSolutionsSection lang={lang} />
+      <BrandDivider variant="white" />
       <ContactSection lang={lang} />
       <Footer lang={lang} />
       <FloatingActions lang={lang} />
+    </div>
+  );
+}
+
+/* ---------------- Brand divider ---------------- */
+function BrandDivider({ variant = "white" }: { variant?: "white" | "blue" }) {
+  const src = variant === "white" ? "/assets/divider-dark-white.png" : "/assets/divider-light-blue.png";
+  return (
+    <div aria-hidden="true" className="relative w-full py-6 sm:py-10 overflow-hidden">
+      <img
+        src={src}
+        alt=""
+        className="block w-full h-10 sm:h-14 object-cover object-center opacity-40 select-none pointer-events-none"
+        draggable={false}
+      />
     </div>
   );
 }
