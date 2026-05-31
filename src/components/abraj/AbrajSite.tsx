@@ -63,7 +63,7 @@ function BrandDivider({ variant = "white" }: { variant?: "white" | "blue" }) {
       <img
         src={src}
         alt=""
-        className="block w-full h-10 sm:h-14 object-cover object-center opacity-40 select-none pointer-events-none"
+        className="block mx-auto max-w-6xl w-full h-auto opacity-50 select-none pointer-events-none"
         draggable={false}
       />
     </div>
