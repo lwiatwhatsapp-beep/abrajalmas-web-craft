@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Send, MessageCircle, ArrowRight, Sparkles } from "lucide-react";
 import { translations, WA_NUMBER, type Lang } from "./translations";
 import type { Theme } from "./AbrajSite";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 const tc = (theme: Theme, night: string, day: string) => theme === "night" ? night : day;
 
@@ -93,8 +94,32 @@ export function BookingSection({ lang, theme, standalone = false }: { lang: Lang
 
   const buildWa = () => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(t.waTemplate(data))}`;
 
-  const submit = () => {
-    console.log("[ABRAJ ALMAS] Booking submitted:", data);
+  const submit = async () => {
+    // Save to Supabase (non-blocking — WhatsApp will still open even if this fails)
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from("bookings").insert({
+          selected_services:   data.selectedServices,
+          project_type:        data.projectType        || null,
+          location:            data.location           || null,
+          preferred_date:      data.preferredDate      || null,
+          preferred_time:      data.preferredTime      || null,
+          urgency:             data.urgency            || null,
+          project_size:        data.projectSize        || null,
+          project_description: data.projectDescription || null,
+          full_name:           data.fullName,
+          company_name:        data.companyName        || null,
+          phone:               data.phone              || null,
+          whatsapp:            data.whatsapp           || null,
+          email:               data.email              || null,
+          city:                data.city               || null,
+          preferred_contact:   data.preferredContactMethod || null,
+        });
+      } catch (e) {
+        // Silent — booking is still sent via WhatsApp
+        console.warn("[ABRAJ] Booking DB save failed (non-critical):", e);
+      }
+    }
     setStep(5);
   };
 

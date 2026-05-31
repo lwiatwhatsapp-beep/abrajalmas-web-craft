@@ -12,6 +12,7 @@ import logoSymbol from "@/assets/abraj-logo-symbol.png";
 import logoWhite from "@/assets/abraj-logo-white.png";
 import logoBlack from "@/assets/abraj-logo-black.png";
 import { translations, PARTNERS, PHONES, WA_NUMBER, EMAIL, WEBSITE, type Lang } from "./translations";
+import { supabase, isSupabaseConfigured, type DbService, type DbProject, type DbPartner } from "@/lib/supabase";
 
 export type Theme = "night" | "day";
 /** Returns night class or day class based on current theme */
@@ -60,6 +61,24 @@ export default function AbrajSite() {
   const t = translations[lang];
   const isAr = lang === "ar";
 
+  // Dynamic data loaded from Supabase (falls back to static data if not available)
+  const [dynServices, setDynServices] = useState<DbService[] | null>(null);
+  const [dynProjects, setDynProjects] = useState<DbProject[] | null>(null);
+  const [dynPartners, setDynPartners] = useState<DbPartner[] | null>(null);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) return;
+    Promise.all([
+      supabase.from("services").select("*").order("order_num"),
+      supabase.from("projects").select("*").order("order_num"),
+      supabase.from("partners").select("*").order("order_num"),
+    ]).then(([srv, prj, prt]) => {
+      if (srv.data?.length) setDynServices(srv.data as DbService[]);
+      if (prj.data?.length) setDynProjects(prj.data as DbProject[]);
+      if (prt.data?.length) setDynPartners(prt.data as DbPartner[]);
+    }).catch(() => { /* silent – use static fallback */ });
+  }, []);
+
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = t.dir;
@@ -103,11 +122,11 @@ export default function AbrajSite() {
         <VisionSection lang={lang} theme={theme} />
         <WhyUsSection lang={lang} theme={theme} />
         <BrandDivider theme={theme} direction="right" />
-        <ServicesSection lang={lang} theme={theme} />
+        <ServicesSection lang={lang} theme={theme} dynServices={dynServices} />
         <ProcessSection lang={lang} theme={theme} />
         <BrandDivider theme={theme} direction="left" />
-        <ProjectsSection lang={lang} theme={theme} />
-        <PartnersMarquee lang={lang} theme={theme} />
+        <ProjectsSection lang={lang} theme={theme} dynProjects={dynProjects} />
+        <PartnersMarquee lang={lang} theme={theme} dynPartners={dynPartners} />
         <BusinessSolutionsSection lang={lang} theme={theme} />
         <BrandDivider theme={theme} direction="right" />
         <ContactSection lang={lang} theme={theme} />
@@ -792,26 +811,45 @@ function WhyUsSection({ lang, theme }: { lang: Lang; theme: Theme }) {
 }
 
 /* ---------------- Services ---------------- */
-function ServicesSection({ lang, theme }: { lang: Lang; theme: Theme }) {
+function ServicesSection({ lang, theme, dynServices }: { lang: Lang; theme: Theme; dynServices: DbService[] | null }) {
   const t = translations[lang].services;
+  const isAr = lang === "ar";
+
+  // Build display items: prefer DB data, fall back to static
+  const displayItems = dynServices
+    ? dynServices.map((s, i) => ({
+        key: s.id, i,
+        title:    isAr ? s.title_ar : (s.title_en || s.title_ar),
+        desc:     isAr ? s.desc_ar  : (s.desc_en  || s.desc_ar),
+        features: isAr ? (s.features_ar || []) : (s.features_en?.length ? s.features_en : (s.features_ar || [])),
+        imageUrl: s.image_url,
+        linkUrl:  s.link_url,
+      }))
+    : t.items.map((s, i) => ({ key: s.title, i, title: s.title, desc: s.desc, features: s.features, imageUrl: null, linkUrl: null }));
+
   return (
     <section id="services" className="relative py-24 px-4 sm:px-6 lg:px-8">
       <ParallaxBg theme={theme} />
       <div className="max-w-7xl mx-auto">
         <SectionHeader title={t.title} subtitle={t.subtitle} lang={lang} theme={theme} />
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={stagger} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {t.items.map((s, i) => {
-            const Icon = SERVICE_ICONS[i] || Network;
+          {displayItems.map((s) => {
+            const Icon = SERVICE_ICONS[s.i] || Network;
             return (
-              <motion.div key={s.title} variants={fadeUp}>
+              <motion.div key={s.key} variants={fadeUp}>
                 <GlowCard className="glass-card p-6 h-full flex flex-col transition-all hover:border-[#1d3fba]/50 group">
-                  <motion.div
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    transition={{ duration: 0.25 }}
-                    className="w-12 h-12 rounded-xl bg-[#1d3fba]/15 border border-[#1d3fba]/40 flex items-center justify-center mb-4 group-hover:bg-[#1d3fba]/25 group-hover:border-[#1d3fba]/70 group-hover:shadow-[0_0_20px_rgba(29,63,186,0.32)] transition-all"
-                  >
-                    <Icon className="w-6 h-6 text-[#1d3fba]" />
-                  </motion.div>
+                  {s.imageUrl && (
+                    <img src={s.imageUrl} alt={s.title} className="w-full h-32 object-cover rounded-xl mb-4" />
+                  )}
+                  {!s.imageUrl && (
+                    <motion.div
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      transition={{ duration: 0.25 }}
+                      className="w-12 h-12 rounded-xl bg-[#1d3fba]/15 border border-[#1d3fba]/40 flex items-center justify-center mb-4 group-hover:bg-[#1d3fba]/25 group-hover:border-[#1d3fba]/70 group-hover:shadow-[0_0_20px_rgba(29,63,186,0.32)] transition-all"
+                    >
+                      <Icon className="w-6 h-6 text-[#1d3fba]" />
+                    </motion.div>
+                  )}
                   <h3 className={`text-lg font-bold mb-2 ${tc(theme, "text-white", "text-[#111111]")}` }>{s.title}</h3>
                   <p className={`text-sm leading-relaxed mb-4 ${tc(theme, "text-[#e9e9e9]/70", "text-[#5b6472]")}` }>{s.desc}</p>
                   <ul className="space-y-1.5 mb-5 flex-1">
@@ -821,9 +859,15 @@ function ServicesSection({ lang, theme }: { lang: Lang; theme: Theme }) {
                       </li>
                     ))}
                   </ul>
-                  <a href="/booking" className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full border text-sm transition-all hover:bg-[#1d3fba]/15 hover:border-[#1d3fba]/60 ${tc(theme, "bg-white/[0.04] border-white/10 text-white", "bg-white/40 border-[#1d3fba]/15 text-[#111111]")}` }>
-                    {t.bookCta} <ChevronRight className="w-3.5 h-3.5" />
-                  </a>
+                  {s.linkUrl ? (
+                    <a href={s.linkUrl} target="_blank" rel="noopener" className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full border text-sm transition-all hover:bg-[#1d3fba]/15 hover:border-[#1d3fba]/60 ${tc(theme, "bg-white/[0.04] border-white/10 text-white", "bg-white/40 border-[#1d3fba]/15 text-[#111111]")}` }>
+                      {t.bookCta} <ChevronRight className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <a href="/booking" className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full border text-sm transition-all hover:bg-[#1d3fba]/15 hover:border-[#1d3fba]/60 ${tc(theme, "bg-white/[0.04] border-white/10 text-white", "bg-white/40 border-[#1d3fba]/15 text-[#111111]")}` }>
+                      {t.bookCta} <ChevronRight className="w-3.5 h-3.5" />
+                    </a>
+                  )}
                 </GlowCard>
               </motion.div>
             );
@@ -859,8 +903,14 @@ function ProcessSection({ lang, theme }: { lang: Lang; theme: Theme }) {
 }
 
 /* ---------------- Projects (with logo) ---------------- */
-function ProjectsSection({ lang, theme }: { lang: Lang; theme: Theme }) {
+function ProjectsSection({ lang, theme, dynProjects }: { lang: Lang; theme: Theme; dynProjects: DbProject[] | null }) {
   const t = translations[lang].projects;
+  const isAr = lang === "ar";
+
+  const displayItems = dynProjects
+    ? dynProjects.map((p) => ({ key: p.id, name: isAr ? p.title_ar : (p.title_en || p.title_ar), category: p.category || t.categories[0], imageUrl: p.image_url }))
+    : t.items.map((name, i) => ({ key: name, name, category: t.categories[i % t.categories.length], imageUrl: null }));
+
   return (
     <section id="projects" className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <ParallaxBg theme={theme} />
@@ -890,15 +940,16 @@ function ProjectsSection({ lang, theme }: { lang: Lang; theme: Theme }) {
         </motion.div>
         <SectionHeader title={t.title} subtitle={t.subtitle} lang={lang} theme={theme} />
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={stagger} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          {t.items.map((name, i) => (
-            <motion.div key={name} variants={fadeUp} whileHover={{ y: -4 }} className="glass-card p-5 hover:blue-glow transition-all">
+          {displayItems.map((item) => (
+            <motion.div key={item.key} variants={fadeUp} whileHover={{ y: -4 }} className="glass-card p-5 hover:blue-glow transition-all">
               <div className={`aspect-[4/3] rounded-xl border flex items-center justify-center mb-4 relative overflow-hidden ${tc(theme, "bg-gradient-to-br from-[#1d3fba]/25 via-[#1d3fba]/10 to-transparent border-white/10", "bg-gradient-to-br from-[#1d3fba]/10 via-[#1d3fba]/5 to-transparent border-[#1d3fba]/10")}` }>
-                <Diamond className="w-8 h-8 text-[#1d3fba]/70" />
-                <div className={`absolute inset-0 grid-pattern ${tc(theme, "opacity-30", "opacity-20")}` } />
+                {item.imageUrl
+                  ? <img src={item.imageUrl} alt={item.name} className="absolute inset-0 w-full h-full object-cover" />
+                  : <><Diamond className="w-8 h-8 text-[#1d3fba]/70" /><div className={`absolute inset-0 grid-pattern ${tc(theme, "opacity-30", "opacity-20")}` } /></>}
               </div>
-              <h3 className={`text-sm font-bold mb-2 line-clamp-2 ${tc(theme, "text-white", "text-[#111111]")}` }>{name}</h3>
+              <h3 className={`text-sm font-bold mb-2 line-clamp-2 ${tc(theme, "text-white", "text-[#111111]")}` }>{item.name}</h3>
               <div className={`text-[10px] uppercase tracking-wider ${tc(theme, "text-[#e9e9e9]/55", "text-[#5b6472]")}` }>
-                {t.categoryLabel}: <span className={tc(theme, "text-white", "text-[#111111]")}>{t.categories[i % t.categories.length]}</span>
+                {t.categoryLabel}: <span className={tc(theme, "text-white", "text-[#111111]")}>{item.category}</span>
               </div>
               <div className={`text-[10px] uppercase tracking-wider mt-1 ${tc(theme, "text-[#e9e9e9]/55", "text-[#5b6472]")}` }>
                 {t.statusLabel}: <span className="text-emerald-500">{t.status}</span>
@@ -912,7 +963,7 @@ function ProjectsSection({ lang, theme }: { lang: Lang; theme: Theme }) {
 }
 
 /* ---------------- Partners marquee ---------------- */
-function PartnersMarquee({ lang, theme }: { lang: Lang; theme: Theme }) {
+function PartnersMarquee({ lang, theme, dynPartners }: { lang: Lang; theme: Theme; dynPartners: DbPartner[] | null }) {
   const t = translations[lang].partners;
 
   return (
@@ -920,25 +971,35 @@ function PartnersMarquee({ lang, theme }: { lang: Lang; theme: Theme }) {
       <div className="max-w-7xl mx-auto">
         <SectionHeader title={t.title} subtitle={t.subtitle} lang={lang} theme={theme} />
         <div className="flex flex-wrap justify-center gap-4">
-          {PARTNERS.map((p) => {
-            const meta = PARTNER_META[p] ?? { initials: p.slice(0, 2).toUpperCase(), color: "#1d3fba", bg: "rgba(29,63,186,0.12)" };
-            return (
-              <motion.div
-                key={p}
-                whileHover={{ scale: 1.06, y: -4 }}
-                transition={{ duration: 0.2 }}
-                className={`glass-card flex flex-col items-center justify-center gap-3 px-6 py-5 w-[130px] cursor-default ${tc(theme, "hover:border-white/20", "hover:border-[#1d3fba]/40")}`}
-              >
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black tracking-tight shrink-0 border transition-all duration-300"
-                  style={{ background: meta.bg, color: meta.color, borderColor: `${meta.color}40`, boxShadow: `0 0 12px ${meta.color}22` }}
-                >
-                  {meta.initials}
-                </div>
-                <span className={`text-xs font-bold tracking-wide text-center leading-tight ${tc(theme, "text-white/80", "text-[#111111]/75")}`}>{p}</span>
-              </motion.div>
-            );
-          })}
+          {dynPartners
+            ? dynPartners.map((p) => (
+                <motion.div key={p.id} whileHover={{ scale: 1.06, y: -4 }} transition={{ duration: 0.2 }}
+                  className={`glass-card flex flex-col items-center justify-center gap-3 px-6 py-5 w-[130px] cursor-default ${tc(theme, "hover:border-white/20", "hover:border-[#1d3fba]/40")}`}>
+                  {p.image_url ? (
+                    <img src={p.image_url} alt={p.name} className="w-12 h-12 rounded-2xl object-cover" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black tracking-tight shrink-0 border transition-all duration-300"
+                      style={{ background: p.bg_color, color: p.color, borderColor: `${p.color}40`, boxShadow: `0 0 12px ${p.color}22` }}>
+                      {p.initials}
+                    </div>
+                  )}
+                  <span className={`text-xs font-bold tracking-wide text-center leading-tight ${tc(theme, "text-white/80", "text-[#111111]/75")}`}>{p.name}</span>
+                </motion.div>
+              ))
+            : PARTNERS.map((p) => {
+                const meta = PARTNER_META[p] ?? { initials: p.slice(0, 2).toUpperCase(), color: "#1d3fba", bg: "rgba(29,63,186,0.12)" };
+                return (
+                  <motion.div key={p} whileHover={{ scale: 1.06, y: -4 }} transition={{ duration: 0.2 }}
+                    className={`glass-card flex flex-col items-center justify-center gap-3 px-6 py-5 w-[130px] cursor-default ${tc(theme, "hover:border-white/20", "hover:border-[#1d3fba]/40")}`}>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black tracking-tight shrink-0 border transition-all duration-300"
+                      style={{ background: meta.bg, color: meta.color, borderColor: `${meta.color}40`, boxShadow: `0 0 12px ${meta.color}22` }}>
+                      {meta.initials}
+                    </div>
+                    <span className={`text-xs font-bold tracking-wide text-center leading-tight ${tc(theme, "text-white/80", "text-[#111111]/75")}`}>{p}</span>
+                  </motion.div>
+                );
+              })
+          }
         </div>
       </div>
     </section>
