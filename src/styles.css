@@ -169,7 +169,7 @@
   .blue-glow-strong {
     box-shadow: 0 0 70px rgba(29, 63, 186, 0.45);
   }
-  .gold-glow {
+  .gold-glow-legacy {
     box-shadow: 0 0 40px rgba(252, 182, 48, 0.35);
   }
   .grid-pattern {
