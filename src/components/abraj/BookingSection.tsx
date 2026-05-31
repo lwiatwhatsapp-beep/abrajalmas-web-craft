@@ -2,6 +2,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Send, MessageCircle, ArrowRight, Sparkles } from "lucide-react";
 import { translations, WA_NUMBER, type Lang } from "./translations";
+import type { Theme } from "./AbrajSite";
+
+const tc = (theme: Theme, night: string, day: string) => theme === "night" ? night : day;
 
 type BookingData = {
   selectedServices: string[];
@@ -39,7 +42,7 @@ const initialData: BookingData = {
   preferredContactMethod: "",
 };
 
-export function BookingSection({ lang }: { lang: Lang }) {
+export function BookingSection({ lang, theme }: { lang: Lang; theme: Theme }) {
   const t = translations[lang].booking;
   const isAr = lang === "ar";
   const [step, setStep] = useState(1);
@@ -106,8 +109,8 @@ export function BookingSection({ lang }: { lang: Lang }) {
             <Sparkles className="w-4 h-4" />
             {isAr ? "نظام الحجز" : "Booking System"}
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">{t.title}</h2>
-          <p className="mt-4 text-[#e9e9e9]/80 max-w-2xl mx-auto">{t.subtitle}</p>
+          <h2 className={`text-3xl sm:text-5xl font-extrabold tracking-tight ${tc(theme, "text-white", "text-[#0b0b0b]")}` }>{t.title}</h2>
+          <p className={`mt-4 max-w-2xl mx-auto ${tc(theme, "text-[#e9e9e9]/80", "text-[#3d4451]")}` }>{t.subtitle}</p>
         </motion.div>
 
         <div className="glass-card blue-glow p-6 sm:p-10">
@@ -125,16 +128,26 @@ export function BookingSection({ lang }: { lang: Lang }) {
                         ? "bg-[#1d3fba] text-white border-[#1d3fba] blue-glow"
                         : done
                           ? "bg-[#1d3fba] text-white border-[#1d3fba]"
-                          : "border-white/15 text-white/50 bg-white/5"
+                          : tc(theme, "border-white/15 text-white/50 bg-white/5", "border-[#1d3fba]/20 text-[#5b6472] bg-[#1d3fba]/5")
                     }`}
                   >
                     {done ? <Check className="w-4 h-4" /> : n}
                   </div>
                   <div className="hidden md:block">
-                    <div className="text-[10px] uppercase tracking-wider text-white/40">{t.stepLabel} {n}</div>
-                    <div className={`text-sm font-medium ${active ? "text-white" : "text-white/60"}`}>{label}</div>
+                    <div className={`text-[10px] uppercase tracking-wider ${tc(theme, "text-white/40", "text-[#5b6472]")}` }>{t.stepLabel} {n}</div>
+                    <div className={`text-sm font-medium ${active ? tc(theme, "text-white", "text-[#111111]") : tc(theme, "text-white/60", "text-[#5b6472]")}`}>{label}</div>
                   </div>
-                  {n < t.steps.length && <div className="flex-1 h-px bg-white/10 mx-1" />}
+                  {n < t.steps.length && (
+                    <div className={`relative flex-1 h-px mx-1 overflow-hidden ${tc(theme, "bg-white/10", "bg-[#1d3fba]/15")}`}>
+                      <motion.div
+                        className="absolute inset-0 bg-[#1d3fba]"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: done ? 1 : 0 }}
+                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                        style={{ transformOrigin: isAr ? "right" : "left" }}
+                      />
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -150,7 +163,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
             >
               {step === 1 && (
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">{t.steps[0]}</h3>
+                  <h3 className={`text-xl sm:text-2xl font-bold mb-6 ${tc(theme, "text-white", "text-[#111111]")}` }>{t.steps[0]}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {t.services.map((s) => {
                       const selected = data.selectedServices.includes(s);
@@ -162,7 +175,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                           className={`group relative text-start p-5 rounded-2xl border transition-all duration-300 ${
                             selected
                               ? "border-[#1d3fba] bg-[#1d3fba]/10 blue-glow"
-                              : "border-white/10 bg-white/[0.02] hover:border-white/25"
+                              : tc(theme, "border-white/10 bg-white/[0.02] hover:border-white/25", "border-[#1d3fba]/15 bg-white/60 hover:border-[#1d3fba]/40")
                           }`}
                         >
                           <div className="flex items-start gap-3">
@@ -173,7 +186,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                             >
                               {selected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
                             </div>
-                            <span className={`font-medium ${selected ? "text-white" : "text-[#e9e9e9]"}`}>{s}</span>
+                            <span className={`font-medium ${selected ? "text-white" : tc(theme, "text-[#e9e9e9]", "text-[#111111]")}`}>{s}</span>
                           </div>
                         </button>
                       );
@@ -185,7 +198,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
 
               {step === 2 && (
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">{t.steps[1]}</h3>
+                  <h3 className={`text-xl sm:text-2xl font-bold mb-6 ${tc(theme, "text-white", "text-[#111111]")}` }>{t.steps[1]}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <Field label={t.labels.projectType} error={errors.projectType}>
                       <Select value={data.projectType} onChange={(v) => update("projectType", v)} options={t.projectTypes} placeholder="—" />
@@ -211,7 +224,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                           value={data.projectDescription}
                           onChange={(e) => update("projectDescription", e.target.value)}
                           rows={4}
-                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent"
+                          className={`w-full border rounded-xl px-4 py-3 placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent ${tc(theme, "bg-white/[0.03] border-white/10 text-white placeholder:text-white/30", "bg-white border-[#1d3fba]/15 text-[#111111]")}`}
                         />
                       </Field>
                     </div>
@@ -229,7 +242,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
 
               {step === 3 && (
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">{t.steps[2]}</h3>
+                  <h3 className={`text-xl sm:text-2xl font-bold mb-6 ${tc(theme, "text-white", "text-[#111111]")}` }>{t.steps[2]}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <Field label={t.labels.fullName} error={errors.fullName}>
                       <Input value={data.fullName} onChange={(v) => update("fullName", v)} />
@@ -260,7 +273,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                               className={`px-5 py-2.5 rounded-full border text-sm transition-all ${
                                 data.preferredContactMethod === m
                                   ? "border-[#1d3fba] bg-[#1d3fba]/20 text-white"
-                                  : "border-white/10 bg-white/[0.03] text-[#e9e9e9] hover:border-white/25"
+                                  : tc(theme, "border-white/10 bg-white/[0.03] text-[#e9e9e9] hover:border-white/25", "border-[#1d3fba]/15 bg-white/60 text-[#111111] hover:border-[#1d3fba]/40")
                               }`}
                             >
                               {m}
@@ -275,7 +288,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
 
               {step === 4 && (
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">{t.steps[3]}</h3>
+                  <h3 className={`text-xl sm:text-2xl font-bold mb-6 ${tc(theme, "text-white", "text-[#111111]")}` }>{t.steps[3]}</h3>
                   <div className="space-y-4">
                     <ReviewBlock label={t.labels.selected}>
                       <div className="flex flex-wrap gap-2">
@@ -312,10 +325,10 @@ export function BookingSection({ lang }: { lang: Lang }) {
                   <div className="mx-auto w-20 h-20 rounded-full bg-[#1d3fba] flex items-center justify-center blue-glow mb-6">
                     <Check className="w-10 h-10 text-white" strokeWidth={3} />
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">{t.success.title}</h3>
-                  <p className="text-[#e9e9e9]/80 max-w-lg mx-auto mb-8">{t.success.message}</p>
+                  <h3 className={`text-2xl sm:text-3xl font-extrabold mb-3 ${tc(theme, "text-white", "text-[#111111]")}` }>{t.success.title}</h3>
+                  <p className={`max-w-lg mx-auto mb-8 ${tc(theme, "text-[#e9e9e9]/80", "text-[#3d4451]")}` }>{t.success.message}</p>
                   <div className="flex flex-wrap justify-center gap-3">
-                    <button onClick={reset} className="px-5 py-2.5 rounded-full bg-white/[0.05] border border-white/15 text-white hover:bg-white/10">{t.success.backHome}</button>
+                    <button onClick={reset} className={`px-5 py-2.5 rounded-full border ${tc(theme, "bg-white/[0.05] border-white/15 text-white hover:bg-white/10", "bg-white/80 border-[#1d3fba]/15 text-[#111111] hover:bg-white")}` }>{t.success.backHome}</button>
                     <button onClick={reset} className="px-5 py-2.5 rounded-full bg-[#1d3fba] text-white hover:brightness-110">{t.success.another}</button>
                     <a href={buildWa()} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-full bg-[#1d3fba] text-white font-semibold hover:brightness-110 inline-flex items-center gap-2">
                       <MessageCircle className="w-4 h-4" />{t.success.contactWa}
@@ -328,11 +341,11 @@ export function BookingSection({ lang }: { lang: Lang }) {
 
           {/* Nav buttons */}
           {step < 5 && (
-            <div className="mt-10 flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-white/10">
+            <div className={`mt-10 flex flex-wrap items-center justify-between gap-3 pt-6 border-t ${tc(theme, "border-white/10", "border-[#1d3fba]/15")}` }>
               <button
                 onClick={back}
                 disabled={step === 1}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-white/[0.03] text-white disabled:opacity-30 hover:bg-white/10"
+                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full border disabled:opacity-30 ${tc(theme, "border-white/10 bg-white/[0.03] text-white hover:bg-white/10", "border-[#1d3fba]/15 bg-white/60 text-[#111111] hover:bg-white")}` }
               >
                 {isAr ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
                 {t.back}
@@ -362,48 +375,52 @@ export function BookingSection({ lang }: { lang: Lang }) {
   );
 }
 
-function Field({ label, children, error }: { label: string; children: React.ReactNode; error?: string }) {
+function Field({ label, children, error, theme }: { label: string; children: React.ReactNode; error?: string; theme?: Theme }) {
+  const _theme = theme ?? "night";
   return (
     <label className="block">
-      <span className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-2">{label}</span>
+      <span className={`block text-xs font-semibold uppercase tracking-wider mb-2 ${tc(_theme, "text-white/70", "text-[#3d4451]")}` }>{label}</span>
       {children}
       {error && <span className="block mt-1.5 text-xs text-red-400">{error}</span>}
     </label>
   );
 }
 
-function Input({ value, onChange, type = "text", dir }: { value: string; onChange: (v: string) => void; type?: string; dir?: "ltr" | "rtl" }) {
+function Input({ value, onChange, type = "text", dir, theme }: { value: string; onChange: (v: string) => void; type?: string; dir?: "ltr" | "rtl"; theme?: Theme }) {
+  const _theme = theme ?? "night";
   return (
     <input
       type={type}
       value={value}
       dir={dir}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent"
+      className={`w-full border rounded-xl px-4 py-3 placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent ${tc(_theme, "bg-white/[0.03] border-white/10 text-white placeholder:text-white/30", "bg-white border-[#1d3fba]/15 text-[#111111]")}` }
     />
   );
 }
 
-function Select({ value, onChange, options, placeholder }: { value: string; onChange: (v: string) => void; options: string[]; placeholder: string }) {
+function Select({ value, onChange, options, placeholder, theme }: { value: string; onChange: (v: string) => void; options: string[]; placeholder: string; theme?: Theme }) {
+  const _theme = theme ?? "night";
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent"
+      className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent ${tc(_theme, "bg-white/[0.03] border-white/10 text-white [&>option]:bg-black", "bg-white border-[#1d3fba]/15 text-[#111111] [&>option]:bg-white")}` }
     >
-      <option value="" className="bg-black">{placeholder}</option>
+      <option value="">{placeholder}</option>
       {options.map((o) => (
-        <option key={o} value={o} className="bg-black">{o}</option>
+        <option key={o} value={o}>{o}</option>
       ))}
     </select>
   );
 }
 
-function ReviewBlock({ label, children }: { label: string; children: React.ReactNode }) {
+function ReviewBlock({ label, children, theme }: { label: string; children: React.ReactNode; theme?: Theme }) {
+  const _theme = theme ?? "night";
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-      <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1">{label}</div>
-      <div className="text-sm text-white">{children}</div>
+    <div className={`rounded-2xl border p-4 ${tc(_theme, "border-white/10 bg-white/[0.02]", "border-[#1d3fba]/15 bg-white/60")}` }>
+      <div className={`text-[10px] uppercase tracking-wider mb-1 ${tc(_theme, "text-white/40", "text-[#5b6472]")}` }>{label}</div>
+      <div className={`text-sm ${tc(_theme, "text-white", "text-[#111111]")}` }>{children}</div>
     </div>
   );
 }
