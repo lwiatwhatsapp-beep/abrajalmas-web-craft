@@ -914,8 +914,6 @@ function ProjectsSection({ lang, theme }: { lang: Lang; theme: Theme }) {
 /* ---------------- Partners marquee ---------------- */
 function PartnersMarquee({ lang, theme }: { lang: Lang; theme: Theme }) {
   const t = translations[lang].partners;
-  // Double the list — animate from 0 to -50% for a seamless loop
-  const doubled = useMemo(() => [...PARTNERS, ...PARTNERS], []);
 
   const Card = ({ p, idx }: { p: string; idx: number }) => {
     const meta = PARTNER_META[p] ?? { initials: p.slice(0, 2).toUpperCase(), color: "#1d3fba", bg: "rgba(29,63,186,0.12)" };
@@ -942,11 +940,18 @@ function PartnersMarquee({ lang, theme }: { lang: Lang; theme: Theme }) {
       </div>
 
       <div className="relative overflow-hidden mask-fade">
+        {/* Two identical groups side-by-side. pe-4 on each group adds a trailing gap
+            equal to the inner gap-4, so -50% translateX lands exactly at group-2's start. */}
         <div
-          className="flex gap-4"
+          className="flex"
           style={{ direction: "ltr", width: "max-content", animation: "marquee 30s linear infinite" }}
         >
-          {doubled.map((p, i) => <Card key={`${p}-${i}`} p={p} idx={i} />)}
+          <div className="flex gap-4 pe-4">
+            {PARTNERS.map((p, i) => <Card key={`a-${i}`} p={p} idx={i} />)}
+          </div>
+          <div className="flex gap-4 pe-4">
+            {PARTNERS.map((p, i) => <Card key={`b-${i}`} p={p} idx={i} />)}
+          </div>
         </div>
       </div>
     </section>
