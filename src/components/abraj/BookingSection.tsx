@@ -102,7 +102,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
           viewport={{ once: true, amount: 0.2 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#fcb630]/30 bg-[#fcb630]/5 text-[#fcb630] text-xs sm:text-sm mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-white text-xs sm:text-sm mb-5">
             <Sparkles className="w-4 h-4" />
             {isAr ? "نظام الحجز" : "Booking System"}
           </div>
@@ -122,7 +122,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                   <div
                     className={`flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full border text-sm font-bold transition-all ${
                       active
-                        ? "bg-[#fcb630] text-black border-[#fcb630] gold-glow"
+                        ? "bg-[#1d3fba] text-white border-[#1d3fba] blue-glow"
                         : done
                           ? "bg-[#1d3fba] text-white border-[#1d3fba]"
                           : "border-white/15 text-white/50 bg-white/5"
@@ -168,10 +168,10 @@ export function BookingSection({ lang }: { lang: Lang }) {
                           <div className="flex items-start gap-3">
                             <div
                               className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center border transition-all ${
-                                selected ? "bg-[#fcb630] border-[#fcb630]" : "border-white/20 bg-white/5"
+                                selected ? "bg-[#1d3fba] border-[#1d3fba]" : "border-white/20 bg-white/5"
                               }`}
                             >
-                              {selected && <Check className="w-4 h-4 text-black" strokeWidth={3} />}
+                              {selected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
                             </div>
                             <span className={`font-medium ${selected ? "text-white" : "text-[#e9e9e9]"}`}>{s}</span>
                           </div>
@@ -211,7 +211,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                           value={data.projectDescription}
                           onChange={(e) => update("projectDescription", e.target.value)}
                           rows={4}
-                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#fcb630] focus:border-transparent"
+                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent"
                         />
                       </Field>
                     </div>
@@ -259,7 +259,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                               onClick={() => update("preferredContactMethod", m)}
                               className={`px-5 py-2.5 rounded-full border text-sm transition-all ${
                                 data.preferredContactMethod === m
-                                  ? "border-[#fcb630] bg-[#fcb630]/15 text-[#fcb630]"
+                                  ? "border-[#1d3fba] bg-[#1d3fba]/20 text-white"
                                   : "border-white/10 bg-white/[0.03] text-[#e9e9e9] hover:border-white/25"
                               }`}
                             >
@@ -309,15 +309,15 @@ export function BookingSection({ lang }: { lang: Lang }) {
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center py-10"
                 >
-                  <div className="mx-auto w-20 h-20 rounded-full bg-[#fcb630] flex items-center justify-center gold-glow mb-6">
-                    <Check className="w-10 h-10 text-black" strokeWidth={3} />
+                  <div className="mx-auto w-20 h-20 rounded-full bg-[#1d3fba] flex items-center justify-center blue-glow mb-6">
+                    <Check className="w-10 h-10 text-white" strokeWidth={3} />
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">{t.success.title}</h3>
                   <p className="text-[#e9e9e9]/80 max-w-lg mx-auto mb-8">{t.success.message}</p>
                   <div className="flex flex-wrap justify-center gap-3">
                     <button onClick={reset} className="px-5 py-2.5 rounded-full bg-white/[0.05] border border-white/15 text-white hover:bg-white/10">{t.success.backHome}</button>
                     <button onClick={reset} className="px-5 py-2.5 rounded-full bg-[#1d3fba] text-white hover:brightness-110">{t.success.another}</button>
-                    <a href={buildWa()} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-full bg-[#fcb630] text-black font-semibold hover:brightness-110 inline-flex items-center gap-2">
+                    <a href={buildWa()} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-full bg-[#1d3fba] text-white font-semibold hover:brightness-110 inline-flex items-center gap-2">
                       <MessageCircle className="w-4 h-4" />{t.success.contactWa}
                     </a>
                   </div>
@@ -339,17 +339,17 @@ export function BookingSection({ lang }: { lang: Lang }) {
               </button>
               <div className="flex gap-3">
                 {step === 4 && (
-                  <a href={buildWa()} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 text-black font-semibold hover:brightness-110">
+                  <a href={buildWa()} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 text-white font-semibold hover:brightness-110">
                     <MessageCircle className="w-4 h-4" />{t.sendWa}
                   </a>
                 )}
                 {step < 4 ? (
-                  <button onClick={next} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#fcb630] text-black font-bold hover:brightness-110 gold-glow">
+                  <button onClick={next} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#1d3fba] text-white font-bold hover:brightness-110 blue-glow">
                     {t.next}
                     {isAr ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </button>
                 ) : (
-                  <button onClick={submit} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#fcb630] text-black font-bold hover:brightness-110 gold-glow">
+                  <button onClick={submit} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#1d3fba] text-white font-bold hover:brightness-110 blue-glow">
                     <Send className="w-4 h-4" />{t.submit}
                   </button>
                 )}
@@ -379,7 +379,7 @@ function Input({ value, onChange, type = "text", dir }: { value: string; onChang
       value={value}
       dir={dir}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#fcb630] focus:border-transparent"
+      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent"
     />
   );
 }
@@ -389,7 +389,7 @@ function Select({ value, onChange, options, placeholder }: { value: string; onCh
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#fcb630] focus:border-transparent"
+      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#1d3fba] focus:border-transparent"
     >
       <option value="" className="bg-black">{placeholder}</option>
       {options.map((o) => (

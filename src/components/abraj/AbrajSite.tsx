@@ -35,18 +35,37 @@ export default function AbrajSite() {
     <div dir={t.dir} lang={lang} className={`${t.fontClass} bg-black text-white min-h-screen overflow-x-hidden`}>
       <Navbar lang={lang} setLang={setLang} />
       <Hero lang={lang} />
+      <BrandDivider variant="white" />
       <AboutSection lang={lang} />
       <VisionSection lang={lang} />
       <WhyUsSection lang={lang} />
+      <BrandDivider variant="white" />
       <ServicesSection lang={lang} />
       <ProcessSection lang={lang} />
+      <BrandDivider variant="white" />
       <BookingSection lang={lang} />
       <ProjectsSection lang={lang} />
       <PartnersMarquee lang={lang} />
       <BusinessSolutionsSection lang={lang} />
+      <BrandDivider variant="white" />
       <ContactSection lang={lang} />
       <Footer lang={lang} />
       <FloatingActions lang={lang} />
+    </div>
+  );
+}
+
+/* ---------------- Brand divider ---------------- */
+function BrandDivider({ variant = "white" }: { variant?: "white" | "blue" }) {
+  const src = variant === "white" ? "/assets/divider-dark-white.png" : "/assets/divider-light-blue.png";
+  return (
+    <div aria-hidden="true" className="relative w-full py-6 sm:py-10 overflow-hidden">
+      <img
+        src={src}
+        alt=""
+        className="block mx-auto max-w-6xl w-full h-auto opacity-50 select-none pointer-events-none"
+        draggable={false}
+      />
     </div>
   );
 }
@@ -85,13 +104,13 @@ function Navbar({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
 
         <nav className="hidden lg:flex items-center gap-1">
           {links.map((l) => (
-            <a key={l.id} href={`#${l.id}`} className="px-3 py-2 text-sm text-[#e9e9e9] hover:text-[#fcb630] transition-colors">{l.label}</a>
+            <a key={l.id} href={`#${l.id}`} className="px-3 py-2 text-sm text-[#e9e9e9] hover:text-[#1d3fba] transition-colors">{l.label}</a>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
           <LangToggle lang={lang} setLang={setLang} />
-          <a href="#booking" className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#fcb630] text-black text-sm font-bold hover:brightness-110 gold-glow">
+          <a href="#booking" className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1d3fba] text-white text-sm font-bold hover:brightness-110 blue-glow">
             {t.cta}
           </a>
           <button onClick={() => setOpen((v) => !v)} className="lg:hidden p-2 rounded-lg border border-white/10 text-white" aria-label="menu">
@@ -112,7 +131,7 @@ function Navbar({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
               {links.map((l) => (
                 <a key={l.id} href={`#${l.id}`} onClick={() => setOpen(false)} className="py-2.5 px-3 rounded-lg text-[#e9e9e9] hover:bg-white/5">{l.label}</a>
               ))}
-              <a href="#booking" onClick={() => setOpen(false)} className="mt-2 text-center py-3 rounded-xl bg-[#fcb630] text-black font-bold">{t.cta}</a>
+              <a href="#booking" onClick={() => setOpen(false)} className="mt-2 text-center py-3 rounded-xl bg-[#1d3fba] text-white font-bold">{t.cta}</a>
             </div>
           </motion.div>
         )}
@@ -149,7 +168,7 @@ function Hero({ lang }: { lang: Lang }) {
             <img src={logoSymbol} alt="" className="w-14 h-14 sm:w-16 sm:h-16 object-contain" />
           </motion.div>
           <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-[#e9e9e9] text-xs sm:text-sm mb-6">
-            <Diamond className="w-3.5 h-3.5 text-[#fcb630]" />
+            <Diamond className="w-3.5 h-3.5 text-[#1d3fba]" />
             {t.label}
           </motion.div>
           <motion.h1 variants={fadeUp} className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white">
@@ -162,13 +181,13 @@ function Hero({ lang }: { lang: Lang }) {
             {t.para}
           </motion.p>
           <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <a href="#booking" className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#fcb630] text-black font-bold hover:brightness-110 gold-glow">
+            <a href="#booking" className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1d3fba] text-white font-bold hover:brightness-110 blue-glow">
               {t.primary} <ChevronRight className="w-4 h-4" />
             </a>
             <a href="#services" className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/15 bg-white/[0.04] text-white hover:bg-white/[0.08] backdrop-blur-md">
               {t.secondary}
             </a>
-            <a href="#partners" className="inline-flex items-center gap-1 text-sm text-[#e9e9e9]/70 hover:text-[#fcb630] underline-offset-4 hover:underline px-3 py-2">
+            <a href="#partners" className="inline-flex items-center gap-1 text-sm text-[#e9e9e9]/70 hover:text-[#1d3fba] underline-offset-4 hover:underline px-3 py-2">
               {t.third} <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
           </motion.div>
@@ -198,7 +217,7 @@ function BackgroundFx() {
       <motion.div
         animate={{ x: [0, -50, 0], y: [0, 50, 0], opacity: [0.18, 0.35, 0.18] }}
         transition={{ duration: 18, repeat: Infinity, repeatType: "reverse" }}
-        className="absolute top-1/3 -right-40 w-[460px] h-[460px] rounded-full bg-[#fcb630] blur-[160px] opacity-25"
+        className="absolute top-1/3 -right-40 w-[460px] h-[460px] rounded-full bg-[#1d3fba] blur-[160px] opacity-25"
       />
       <motion.div
         animate={{ rotate: [0, 360] }}
@@ -220,7 +239,7 @@ function SectionHeader({ eyebrow, title, subtitle, lang }: { eyebrow?: string; t
   return (
     <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={stagger} className="text-center max-w-3xl mx-auto mb-14">
       {eyebrow && (
-        <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-[#fcb630] text-xs mb-4">
+        <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-white text-xs mb-4">
           <Diamond className="w-3.5 h-3.5" />{eyebrow}
         </motion.div>
       )}
@@ -245,7 +264,7 @@ function AboutSection({ lang }: { lang: Lang }) {
           {t.cards.map((c) => (
             <motion.div key={c.title} variants={fadeUp} whileHover={{ y: -6 }} className="glass-card p-7 hover:blue-glow transition-shadow">
               <div className="w-12 h-12 rounded-xl bg-[#1d3fba]/15 border border-[#1d3fba]/40 flex items-center justify-center mb-4">
-                <Diamond className="w-5 h-5 text-[#fcb630]" />
+                <Diamond className="w-5 h-5 text-[#1d3fba]" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">{c.title}</h3>
               <p className="text-[#e9e9e9]/75 text-sm leading-relaxed">{c.text}</p>
@@ -264,10 +283,10 @@ function VisionSection({ lang }: { lang: Lang }) {
     <section className="relative py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.7 }} className="glass-card blue-glow-strong p-10 sm:p-14 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1d3fba]/10 via-transparent to-[#fcb630]/5 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1d3fba]/10 via-transparent to-[#1d3fba]/5 pointer-events-none" />
           <div className="relative">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-[#fcb630]/15 border border-[#fcb630]/40 flex items-center justify-center mb-6">
-              <Diamond className="w-6 h-6 text-[#fcb630]" />
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-[#1d3fba]/15 border border-[#1d3fba]/40 flex items-center justify-center mb-6">
+              <Diamond className="w-6 h-6 text-[#1d3fba]" />
             </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-6">{t.title}</h2>
             <p className="text-lg sm:text-xl text-[#e9e9e9]/85 leading-relaxed max-w-3xl mx-auto">{t.text}</p>
@@ -290,8 +309,8 @@ function WhyUsSection({ lang }: { lang: Lang }) {
             const Icon = WHY_ICONS[i] || ShieldCheck;
             return (
               <motion.div key={it.title} variants={fadeUp} whileHover={{ y: -6 }} className="glass-card p-6 hover:blue-glow transition-all">
-                <div className="w-11 h-11 rounded-xl bg-[#fcb630]/15 border border-[#fcb630]/40 flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-[#fcb630]" />
+                <div className="w-11 h-11 rounded-xl bg-[#1d3fba]/15 border border-[#1d3fba]/40 flex items-center justify-center mb-4">
+                  <Icon className="w-5 h-5 text-[#1d3fba]" />
                 </div>
                 <h3 className="text-base font-bold text-white mb-2">{it.title}</h3>
                 <p className="text-[#e9e9e9]/70 text-xs leading-relaxed">{it.text}</p>
@@ -317,18 +336,18 @@ function ServicesSection({ lang }: { lang: Lang }) {
             return (
               <motion.div key={s.title} variants={fadeUp} whileHover={{ y: -6 }} className="glass-card p-6 hover:blue-glow transition-all flex flex-col">
                 <div className="w-12 h-12 rounded-xl bg-[#1d3fba]/15 border border-[#1d3fba]/40 flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-[#fcb630]" />
+                  <Icon className="w-6 h-6 text-[#1d3fba]" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">{s.title}</h3>
                 <p className="text-[#e9e9e9]/70 text-sm leading-relaxed mb-4">{s.desc}</p>
                 <ul className="space-y-1.5 mb-5 flex-1">
                   {s.features.map((f) => (
                     <li key={f} className="text-xs text-[#e9e9e9]/80 flex items-start gap-2">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#fcb630] flex-shrink-0" />{f}
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1d3fba] flex-shrink-0" />{f}
                     </li>
                   ))}
                 </ul>
-                <a href="#booking" className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-white/[0.04] border border-white/10 text-sm text-[#fcb630] hover:bg-[#fcb630]/10 hover:border-[#fcb630]/40 transition-all">
+                <a href="#booking" className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-white/[0.04] border border-white/10 text-sm text-white hover:bg-[#1d3fba]/15 hover:border-[#1d3fba]/60 transition-all">
                   {t.bookCta} <ChevronRight className="w-3.5 h-3.5" />
                 </a>
               </motion.div>
@@ -352,7 +371,7 @@ function ProcessSection({ lang }: { lang: Lang }) {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={stagger} className="grid lg:grid-cols-5 gap-5">
             {t.steps.map((s, i) => (
               <motion.div key={s.title} variants={fadeUp} className="glass-card p-6 hover:blue-glow transition-all relative">
-                <div className="w-12 h-12 rounded-full bg-black border-2 border-[#fcb630] text-[#fcb630] font-extrabold flex items-center justify-center mb-4 gold-glow">{i + 1}</div>
+                <div className="w-12 h-12 rounded-full bg-black border-2 border-[#1d3fba] text-[#1d3fba] font-extrabold flex items-center justify-center mb-4 blue-glow">{i + 1}</div>
                 <h3 className="text-base font-bold text-white mb-2">{s.title}</h3>
                 <p className="text-[#e9e9e9]/70 text-xs leading-relaxed">{s.text}</p>
               </motion.div>
@@ -375,12 +394,12 @@ function ProjectsSection({ lang }: { lang: Lang }) {
           {t.items.map((name, i) => (
             <motion.div key={name} variants={fadeUp} whileHover={{ y: -4 }} className="glass-card p-5 hover:blue-glow transition-all">
               <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-[#1d3fba]/25 via-[#1d3fba]/10 to-transparent border border-white/10 flex items-center justify-center mb-4 relative overflow-hidden">
-                <Diamond className="w-8 h-8 text-[#fcb630]/70" />
+                <Diamond className="w-8 h-8 text-[#1d3fba]/70" />
                 <div className="absolute inset-0 grid-pattern opacity-30" />
               </div>
               <h3 className="text-sm font-bold text-white mb-2 line-clamp-2">{name}</h3>
               <div className="text-[10px] text-[#e9e9e9]/55 uppercase tracking-wider">
-                {t.categoryLabel}: <span className="text-[#fcb630]">{t.categories[i % t.categories.length]}</span>
+                {t.categoryLabel}: <span className="text-white">{t.categories[i % t.categories.length]}</span>
               </div>
               <div className="text-[10px] text-[#e9e9e9]/55 uppercase tracking-wider mt-1">
                 {t.statusLabel}: <span className="text-emerald-400">{t.status}</span>
@@ -404,7 +423,7 @@ function PartnersMarquee({ lang }: { lang: Lang }) {
         <div className="relative overflow-hidden mask-fade">
           <div className="flex gap-4 w-max animate-marquee" style={{ direction: "ltr" }}>
             {doubled.map((p, i) => (
-              <div key={`${p}-${i}`} className="glass-card px-7 py-5 flex items-center justify-center min-w-[180px] hover:border-[#fcb630]/60 hover:blue-glow transition-all">
+              <div key={`${p}-${i}`} className="glass-card px-7 py-5 flex items-center justify-center min-w-[180px] hover:border-[#1d3fba]/60 hover:blue-glow transition-all">
                 <span className="text-lg font-extrabold tracking-wide text-white/85 hover:text-white">{p}</span>
               </div>
             ))}
@@ -428,7 +447,7 @@ function BusinessSolutionsSection({ lang }: { lang: Lang }) {
             return (
               <motion.div key={it.title} variants={fadeUp} whileHover={{ y: -6 }} className="glass-card p-6 hover:blue-glow transition-all">
                 <div className="w-11 h-11 rounded-xl bg-[#1d3fba]/15 border border-[#1d3fba]/40 flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-[#fcb630]" />
+                  <Icon className="w-5 h-5 text-[#1d3fba]" />
                 </div>
                 <h3 className="text-base font-bold text-white mb-2">{it.title}</h3>
                 <p className="text-[#e9e9e9]/70 text-xs leading-relaxed">{it.text}</p>
@@ -462,16 +481,16 @@ function ContactSection({ lang }: { lang: Lang }) {
 
             <div className="grid grid-cols-2 gap-3 pt-2">
               <a href={`tel:+964${PHONES[0].replace(/^0/, "")}`} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-sm text-white hover:bg-white/10">
-                <Phone className="w-4 h-4 text-[#fcb630]" />{t.quick.call}
+                <Phone className="w-4 h-4 text-[#1d3fba]" />{t.quick.call}
               </a>
               <a href={waLink} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-sm text-white hover:bg-emerald-500/20">
                 <MessageCircle className="w-4 h-4" />{t.quick.wa}
               </a>
-              <a href="#booking" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#fcb630] text-black text-sm font-semibold hover:brightness-110">
+              <a href="#booking" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1d3fba] text-white text-sm font-semibold hover:brightness-110">
                 <Sparkles className="w-4 h-4" />{t.quick.book}
               </a>
               <a href={`mailto:${EMAIL}`} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1d3fba]/20 border border-[#1d3fba]/40 text-sm text-white hover:bg-[#1d3fba]/30">
-                <Mail className="w-4 h-4 text-[#fcb630]" />{t.quick.email}
+                <Mail className="w-4 h-4 text-[#1d3fba]" />{t.quick.email}
               </a>
             </div>
           </div>
@@ -485,16 +504,16 @@ function ContactSection({ lang }: { lang: Lang }) {
             </div>
             <label className="block">
               <span className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-2">{t.labels.service}</span>
-              <select className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#fcb630]">
+              <select className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#1d3fba]">
                 <option value="" className="bg-black">—</option>
                 {services.map((s) => <option key={s} className="bg-black">{s}</option>)}
               </select>
             </label>
             <label className="block">
               <span className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-2">{t.labels.message}</span>
-              <textarea rows={5} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#fcb630]" />
+              <textarea rows={5} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#1d3fba]" />
             </label>
-            <button type="submit" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#fcb630] text-black font-bold hover:brightness-110 gold-glow">
+            <button type="submit" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#1d3fba] text-white font-bold hover:brightness-110 blue-glow">
               {t.labels.send} <ChevronRight className="w-4 h-4" />
             </button>
           </form>
@@ -509,7 +528,7 @@ function ContactCard({ icon: Icon, title, value, href }: { icon: any; title: str
   return (
     <Comp href={href} target={href?.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="glass-card p-4 flex items-center gap-4 hover:blue-glow transition-all">
       <div className="w-11 h-11 rounded-xl bg-[#1d3fba]/15 border border-[#1d3fba]/40 flex items-center justify-center flex-shrink-0">
-        <Icon className="w-5 h-5 text-[#fcb630]" />
+        <Icon className="w-5 h-5 text-[#1d3fba]" />
       </div>
       <div className="min-w-0">
         <div className="text-[10px] uppercase tracking-wider text-white/40">{title}</div>
@@ -523,7 +542,7 @@ function InputField({ label, type = "text", required }: { label: string; type?: 
   return (
     <label className="block">
       <span className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-2">{label}</span>
-      <input type={type} required={required} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#fcb630]" />
+      <input type={type} required={required} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#1d3fba]" />
     </label>
   );
 }
@@ -536,7 +555,7 @@ function Footer({ lang }: { lang: Lang }) {
       <div className="max-w-7xl mx-auto grid lg:grid-cols-4 gap-10">
         <div className="lg:col-span-1">
           <img src={logoHorizontal} alt={lang === "ar" ? "شعار شركة أبراج الماس" : "ABRAJ ALMAS Logo"} className="h-12 w-auto bg-white rounded-lg p-2 mb-4" />
-          <div className="text-[11px] uppercase tracking-wider text-[#fcb630] mb-3">{t.tagline}</div>
+          <div className="text-[11px] uppercase tracking-wider text-[#1d3fba] mb-3">{t.tagline}</div>
           <p className="text-sm text-[#e9e9e9]/70 leading-relaxed">{t.desc}</p>
         </div>
         <FooterCol title={t.colServicesTitle} items={t.colServices} />
@@ -556,7 +575,7 @@ function FooterCol({ title, items, ltr }: { title: string; items: string[]; ltr?
       <h4 className="text-sm font-bold text-white mb-4">{title}</h4>
       <ul className="space-y-2">
         {items.map((i) => (
-          <li key={i} className="text-sm text-[#e9e9e9]/70 hover:text-[#fcb630] transition-colors" dir={ltr ? "ltr" : undefined}>{i}</li>
+          <li key={i} className="text-sm text-[#e9e9e9]/70 hover:text-[#1d3fba] transition-colors" dir={ltr ? "ltr" : undefined}>{i}</li>
         ))}
       </ul>
     </div>
@@ -579,7 +598,7 @@ function FloatingActions({ lang }: { lang: Lang }) {
       </a>
       <a
         href="#booking"
-        className="hidden sm:inline-flex items-center gap-1.5 px-4 h-12 rounded-full bg-[#fcb630] text-black font-bold text-sm hover:brightness-110 gold-glow"
+        className="hidden sm:inline-flex items-center gap-1.5 px-4 h-12 rounded-full bg-[#1d3fba] text-white font-bold text-sm hover:brightness-110 blue-glow"
       >
         <Sparkles className="w-4 h-4" />{t.book}
       </a>
