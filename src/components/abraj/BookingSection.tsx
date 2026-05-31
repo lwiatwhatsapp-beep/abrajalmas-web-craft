@@ -102,7 +102,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
           viewport={{ once: true, amount: 0.2 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1d3fba]/30 bg-[#1d3fba]/5 text-[#1d3fba] text-xs sm:text-sm mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-white text-xs sm:text-sm mb-5">
             <Sparkles className="w-4 h-4" />
             {isAr ? "نظام الحجز" : "Booking System"}
           </div>
@@ -259,7 +259,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                               onClick={() => update("preferredContactMethod", m)}
                               className={`px-5 py-2.5 rounded-full border text-sm transition-all ${
                                 data.preferredContactMethod === m
-                                  ? "border-[#1d3fba] bg-[#1d3fba]/15 text-[#1d3fba]"
+                                  ? "border-[#1d3fba] bg-[#1d3fba]/20 text-white"
                                   : "border-white/10 bg-white/[0.03] text-[#e9e9e9] hover:border-white/25"
                               }`}
                             >
