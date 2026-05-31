@@ -220,7 +220,7 @@ function SectionHeader({ eyebrow, title, subtitle, lang }: { eyebrow?: string; t
   return (
     <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={stagger} className="text-center max-w-3xl mx-auto mb-14">
       {eyebrow && (
-        <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-[#1d3fba] text-xs mb-4">
+        <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-white text-xs mb-4">
           <Diamond className="w-3.5 h-3.5" />{eyebrow}
         </motion.div>
       )}
@@ -328,7 +328,7 @@ function ServicesSection({ lang }: { lang: Lang }) {
                     </li>
                   ))}
                 </ul>
-                <a href="#booking" className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-white/[0.04] border border-white/10 text-sm text-[#1d3fba] hover:bg-[#1d3fba]/10 hover:border-[#1d3fba]/40 transition-all">
+                <a href="#booking" className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-white/[0.04] border border-white/10 text-sm text-white hover:bg-[#1d3fba]/15 hover:border-[#1d3fba]/60 transition-all">
                   {t.bookCta} <ChevronRight className="w-3.5 h-3.5" />
                 </a>
               </motion.div>
@@ -380,7 +380,7 @@ function ProjectsSection({ lang }: { lang: Lang }) {
               </div>
               <h3 className="text-sm font-bold text-white mb-2 line-clamp-2">{name}</h3>
               <div className="text-[10px] text-[#e9e9e9]/55 uppercase tracking-wider">
-                {t.categoryLabel}: <span className="text-[#1d3fba]">{t.categories[i % t.categories.length]}</span>
+                {t.categoryLabel}: <span className="text-white">{t.categories[i % t.categories.length]}</span>
               </div>
               <div className="text-[10px] text-[#e9e9e9]/55 uppercase tracking-wider mt-1">
                 {t.statusLabel}: <span className="text-emerald-400">{t.status}</span>
