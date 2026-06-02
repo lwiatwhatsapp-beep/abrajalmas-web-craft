@@ -9,10 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as BookingRouteImport } from './routes/booking'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminJobsPositionsRouteImport } from './routes/admin/jobs-positions'
+import { Route as AdminJobApplicationsRouteImport } from './routes/admin/job-applications'
 
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookingRoute = BookingRouteImport.update({
   id: '/booking',
   path: '/booking',
@@ -28,39 +36,85 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminJobsPositionsRoute = AdminJobsPositionsRouteImport.update({
+  id: '/jobs-positions',
+  path: '/jobs-positions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminJobApplicationsRoute = AdminJobApplicationsRouteImport.update({
+  id: '/job-applications',
+  path: '/job-applications',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/booking': typeof BookingRoute
+  '/jobs': typeof JobsRoute
+  '/admin/job-applications': typeof AdminJobApplicationsRoute
+  '/admin/jobs-positions': typeof AdminJobsPositionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/booking': typeof BookingRoute
+  '/jobs': typeof JobsRoute
+  '/admin/job-applications': typeof AdminJobApplicationsRoute
+  '/admin/jobs-positions': typeof AdminJobsPositionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/booking': typeof BookingRoute
+  '/jobs': typeof JobsRoute
+  '/admin/job-applications': typeof AdminJobApplicationsRoute
+  '/admin/jobs-positions': typeof AdminJobsPositionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/booking'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/booking'
+    | '/jobs'
+    | '/admin/job-applications'
+    | '/admin/jobs-positions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/booking'
-  id: '__root__' | '/' | '/admin' | '/booking'
+  to:
+    | '/'
+    | '/admin'
+    | '/booking'
+    | '/jobs'
+    | '/admin/job-applications'
+    | '/admin/jobs-positions'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/booking'
+    | '/jobs'
+    | '/admin/job-applications'
+    | '/admin/jobs-positions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BookingRoute: typeof BookingRoute
+  JobsRoute: typeof JobsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/booking': {
       id: '/booking'
       path: '/booking'
@@ -82,13 +136,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/jobs-positions': {
+      id: '/admin/jobs-positions'
+      path: '/jobs-positions'
+      fullPath: '/admin/jobs-positions'
+      preLoaderRoute: typeof AdminJobsPositionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/job-applications': {
+      id: '/admin/job-applications'
+      path: '/job-applications'
+      fullPath: '/admin/job-applications'
+      preLoaderRoute: typeof AdminJobApplicationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminJobApplicationsRoute: typeof AdminJobApplicationsRoute
+  AdminJobsPositionsRoute: typeof AdminJobsPositionsRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminJobApplicationsRoute: AdminJobApplicationsRoute,
+  AdminJobsPositionsRoute: AdminJobsPositionsRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   BookingRoute: BookingRoute,
+  JobsRoute: JobsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -11,6 +11,8 @@ import logoHorizontal from "@/assets/abraj-logo-horizontal.png";
 import logoSymbol from "@/assets/abraj-logo-symbol.png";
 import logoWhite from "@/assets/abraj-logo-white.png";
 import logoBlack from "@/assets/abraj-logo-black.png";
+import logoDay from "@/assets/abraj-logo-day.png";
+import logoNight from "@/assets/abraj-logo-night.png";
 import { translations, PARTNERS, PHONES, WA_NUMBER, EMAIL, WEBSITE, type Lang } from "./translations";
 import { supabase, isSupabaseConfigured, type DbService, type DbProject, type DbPartner } from "@/lib/supabase";
 
@@ -106,7 +108,7 @@ export default function AbrajSite() {
         {isLoading && <IntroLoader lang={lang} />}
       </AnimatePresence>
       <motion.div
-        key={langKey}
+        key={`${langKey}-${theme}`}
         initial={{ opacity: 0.85, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -202,12 +204,12 @@ function IntroLoader({ lang }: { lang: Lang }) {
         />
         {/* Logo */}
         <motion.img
-          src={logoSymbol}
+          src={logoNight}
           alt="ABRAJ ALMAS"
           initial={{ opacity: 0, scale: 0.75 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative w-16 h-16 object-contain"
+          className="relative w-24 h-24 object-contain drop-shadow-2xl"
         />
       </div>
       {/* Loading text */}
@@ -332,16 +334,17 @@ function Navbar({
     { id: "home", label: t.home },
     { id: "about", label: t.about },
     { id: "services", label: t.services },
+    { id: "jobs", label: t.jobs },
     { id: "booking", label: t.booking },
     { id: "projects", label: t.projects },
     { id: "partners", label: t.partners },
     { id: "contact", label: t.contact },
   ];
 
-  const navStyle: React.CSSProperties = {
+  const navStyle: React.CSSProperties = useMemo(() => ({
     background: scrolled
-      ? (theme === "night" ? "rgba(5,5,5,0.92)" : "rgba(255,255,255,0.97)")
-      : (theme === "night" ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.40)"),
+      ? (theme === "night" ? "rgba(5,5,5,0.95)" : "rgba(255,255,255,0.97)")
+      : (theme === "night" ? "rgba(0,0,0,0.40)" : "rgba(255,255,255,0.40)"),
     backdropFilter: "blur(24px)",
     WebkitBackdropFilter: "blur(24px)",
     borderBottom: scrolled
@@ -349,11 +352,11 @@ function Navbar({
       : "none",
     boxShadow: scrolled
       ? (theme === "night" ? "0 4px 24px rgba(0,0,0,0.50)" : "0 2px 8px rgba(0,0,0,0.06)")
-      : "none",
-  };
+      : (theme === "night" ? "0 2px 12px rgba(0,0,0,0.30)" : "none"),
+  }), [scrolled, theme]);
 
   return (
-    <header style={navStyle} className="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+    <header key={`nav-${theme}`} style={navStyle} className="fixed top-0 inset-x-0 z-50 transition-all duration-300">
       <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 transition-all duration-300 ${scrolled ? "h-14 sm:h-16" : "h-16 sm:h-20"}`}>
         <a href="#home" className="flex items-center gap-2 flex-shrink-0">
           <motion.img
@@ -367,7 +370,7 @@ function Navbar({
 
         <nav className="hidden lg:flex items-center gap-1">
           {links.map((l) => (
-            <a key={l.id} href={l.id === "booking" ? "/booking" : `#${l.id}`} className={`px-3 py-2 text-sm transition-colors hover:text-[#1d3fba] ${tc(theme, "text-[#e9e9e9]", "text-[#3d4451]")}`}>{l.label}</a>
+            <a key={l.id} href={l.id === "booking" ? "/booking" : l.id === "jobs" ? "/jobs" : `#${l.id}`} className={`px-3 py-2 text-sm font-medium transition-colors hover:text-[#1d3fba] ${tc(theme, "text-white hover:text-[#4d7aff]", "text-[#3d4451]")}`} style={theme === "night" ? { textShadow: "0 1px 3px rgba(0,0,0,0.5)" } : {}}>{l.label}</a>
           ))}
         </nav>
 
@@ -399,7 +402,7 @@ function Navbar({
           >
             <div className="px-4 py-4 flex flex-col gap-1">
               {links.map((l) => (
-                <a key={l.id} href={l.id === "booking" ? "/booking" : `#${l.id}`} onClick={() => setOpen(false)} className={`py-2.5 px-3 rounded-lg transition-colors ${tc(theme, "text-[#e9e9e9] hover:bg-white/5", "text-[#3d4451] hover:bg-[#1d3fba]/5")}`}>{l.label}</a>
+                <a key={l.id} href={l.id === "booking" ? "/booking" : l.id === "jobs" ? "/jobs" : `#${l.id}`} onClick={() => setOpen(false)} className={`py-2.5 px-3 rounded-lg font-medium transition-colors ${tc(theme, "text-white hover:bg-white/5", "text-[#3d4451] hover:bg-[#1d3fba]/5")}`}>{l.label}</a>
               ))}
               <div className="flex items-center gap-2 py-2 px-3">
                 <LangToggle lang={lang} setLang={setLang} theme={theme} />
@@ -448,6 +451,247 @@ function LangToggle({
     </div>
   );
 }
+
+/* ---------------- Quick Services & Projects Preview ---------------- */
+function QuickPreview({ lang, theme }: { lang: Lang; theme: Theme }) {
+  const t = translations[lang];
+  const [activeTab, setActiveTab] = useState<"services" | "projects">("services");
+  const [projectIndex, setProjectIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
+  const quickServices = [
+    { icon: Network, title: lang === "ar" ? "تصميم الشبكات" : "Network Design", desc: lang === "ar" ? "شبكات LAN/WAN والألياف الضوئية" : "LAN/WAN & Fiber Optics" },
+    { icon: Camera, title: lang === "ar" ? "أنظمة المراقبة" : "CCTV Systems", desc: lang === "ar" ? "كاميرات مراقبة ذكية" : "Smart Security Cameras" },
+    { icon: Server, title: lang === "ar" ? "البنية التحتية" : "Infrastructure", desc: lang === "ar" ? "خوادم ومعدات تقنية" : "Servers & Equipment" },
+    { icon: Cpu, title: lang === "ar" ? "أنظمة الجهد المنخفض" : "Low Voltage", desc: lang === "ar" ? "حلول متكاملة" : "Complete Solutions" },
+  ];
+
+  const allProjects = [
+    { icon: Landmark, title: lang === "ar" ? "وزارة الخارجية" : "Ministry of Foreign Affairs", category: lang === "ar" ? "حكومي" : "Government", year: "2023", imageUrl: null },
+    { icon: Building2, title: lang === "ar" ? "سكن بغداد - المنطقة الخضراء" : "Baghdad Residence - Green Zone", category: lang === "ar" ? "سكني" : "Residential", year: "2024", imageUrl: null },
+    { icon: Hotel, title: lang === "ar" ? "قصر الشام" : "Al-Sham Palace", category: lang === "ar" ? "فنادق" : "Hospitality", year: "2023", imageUrl: null },
+    { icon: Building2, title: lang === "ar" ? "أبراج النخيل" : "Al-Nakheel Towers", category: lang === "ar" ? "مؤسسات" : "Enterprise", year: "2024", imageUrl: null },
+    { icon: Store, title: lang === "ar" ? "النخيل مول" : "Al-Nakheel Mall", category: lang === "ar" ? "متاجر" : "Retail", year: "2024", imageUrl: null },
+    { icon: Building2, title: "HOD", category: lang === "ar" ? "مؤسسات" : "Enterprise", year: "2023", imageUrl: null },
+    { icon: School, title: "EISB", category: lang === "ar" ? "تعليم" : "Education", year: "2023", imageUrl: null },
+    { icon: HomeIcon, title: lang === "ar" ? "قرية تجديد" : "Tajdeed Village", category: lang === "ar" ? "سكني" : "Residential", year: "2024", imageUrl: null },
+    { icon: Store, title: lang === "ar" ? "المصدر العلمي" : "Al-Masdar Al-Ilmi", category: lang === "ar" ? "متاجر" : "Retail", year: "2024", imageUrl: null },
+  ];
+
+  const displayedProjects = allProjects.slice(projectIndex, projectIndex + 4);
+  
+  const handleNextProjects = () => {
+    if (projectIndex + 4 < allProjects.length) {
+      setProjectIndex(projectIndex + 4);
+    } else {
+      setProjectIndex(0);
+    }
+  };
+
+  const handlePrevProjects = () => {
+    if (projectIndex - 4 >= 0) {
+      setProjectIndex(projectIndex - 4);
+    } else {
+      setProjectIndex(Math.max(0, allProjects.length - 4));
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Tab Switcher */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={() => setActiveTab("services")}
+          className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
+            activeTab === "services"
+              ? "bg-[#1d3fba] text-white shadow-lg blue-glow scale-105"
+              : tc(theme, "bg-white/[0.06] text-white/90 hover:text-white hover:bg-white/[0.10] border border-white/10", "bg-white/80 text-[#5b6472] hover:text-[#3d4451] hover:bg-white border border-[#1d3fba]/15")
+          }`}
+          style={theme === "night" && activeTab !== "services" ? { textShadow: "0 1px 2px rgba(0,0,0,0.3)" } : {}}
+        >
+          <span className="flex items-center gap-2">
+            <AppWindow className="w-4 h-4" />
+            {lang === "ar" ? "الخدمات" : "Services"}
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab("projects")}
+          className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
+            activeTab === "projects"
+              ? "bg-[#1d3fba] text-white shadow-lg blue-glow scale-105"
+              : tc(theme, "bg-white/[0.06] text-white/90 hover:text-white hover:bg-white/[0.10] border border-white/10", "bg-white/80 text-[#5b6472] hover:text-[#3d4451] hover:bg-white border border-[#1d3fba]/15")
+          }`}
+          style={theme === "night" && activeTab !== "projects" ? { textShadow: "0 1px 2px rgba(0,0,0,0.3)" } : {}}
+        >
+          <span className="flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            {lang === "ar" ? "المشاريع" : "Projects"}
+          </span>
+        </button>
+      </div>
+
+      {/* Content Carousel */}
+      <AnimatePresence mode="wait">
+        {activeTab === "services" ? (
+          <motion.div
+            key="services"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          >
+            {quickServices.map((service, idx) => {
+              const Icon = service.icon;
+              return (
+                <motion.a
+                  key={service.title}
+                  href="#services"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  whileHover={{ y: -6, scale: 1.02 }}
+                  className={`group relative p-6 rounded-2xl border backdrop-blur-xl transition-all shadow-lg ${
+                    tc(theme, 
+                      "border-white/15 bg-gradient-to-br from-white/[0.08] to-white/[0.02] hover:border-[#1d3fba]/40 hover:shadow-[#1d3fba]/20",
+                      "border-[#1d3fba]/15 bg-white/70 hover:bg-white hover:border-[#1d3fba]/40 hover:shadow-[#1d3fba]/10"
+                    )
+                  }`}
+                >
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110 ${
+                    tc(theme, "bg-gradient-to-br from-[#1d3fba]/25 to-[#1d3fba]/10 group-hover:from-[#1d3fba]/35 group-hover:to-[#1d3fba]/15", "bg-gradient-to-br from-[#1d3fba]/15 to-[#1d3fba]/5 group-hover:from-[#1d3fba]/25 group-hover:to-[#1d3fba]/10")
+                  }`}>
+                    <Icon className={`w-7 h-7 ${tc(theme, "text-[#4d7aff]", "text-[#1d3fba]")}`} />
+                  </div>
+                  <h3 className={`font-bold text-sm mb-2 ${tc(theme, "text-white", "text-[#0a0a0a]")}`}>
+                    {service.title}
+                  </h3>
+                  <p className={`text-xs leading-relaxed ${tc(theme, "text-[#e9e9e9]/70", "text-[#5b6472]")}`}>
+                    {service.desc}
+                  </p>
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className={`p-1.5 rounded-full backdrop-blur-md ${tc(theme, "bg-[#1d3fba]/80", "bg-white/95 shadow-lg")}`}>
+                      <ChevronRight className={`w-3.5 h-3.5 ${tc(theme, "text-white", "text-[#1d3fba]")}`} />
+                    </div>
+                  </div>
+                </motion.a>
+              );
+            })}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="projects"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
+            {/* Navigation Arrows */}
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={handlePrevProjects}
+                disabled={projectIndex === 0}
+                className={`p-2.5 rounded-full transition-all ${
+                  projectIndex === 0
+                    ? tc(theme, "opacity-20 cursor-not-allowed bg-white/[0.02]", "opacity-20 cursor-not-allowed bg-gray-100")
+                    : tc(theme, "bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/10 hover:border-white/20", "bg-white/80 hover:bg-white text-[#1d3fba] border border-[#1d3fba]/15 hover:border-[#1d3fba]/30 shadow-sm")
+                }`}
+                aria-label={lang === "ar" ? "السابق" : "Previous"}
+              >
+                <ChevronRight className={`w-5 h-5 ${lang === "ar" ? "" : "rotate-180"}`} />
+              </button>
+              
+              <div className={`text-sm font-semibold ${tc(theme, "text-[#e9e9e9]/70", "text-[#5b6472]")}`}>
+                {lang === "ar" ? `${projectIndex + 1}-${Math.min(projectIndex + 4, allProjects.length)} من ${allProjects.length}` : `${projectIndex + 1}-${Math.min(projectIndex + 4, allProjects.length)} of ${allProjects.length}`}
+              </div>
+
+              <button
+                onClick={handleNextProjects}
+                disabled={projectIndex + 4 >= allProjects.length}
+                className={`p-2.5 rounded-full transition-all ${
+                  projectIndex + 4 >= allProjects.length
+                    ? tc(theme, "opacity-20 cursor-not-allowed bg-white/[0.02]", "opacity-20 cursor-not-allowed bg-gray-100")
+                    : tc(theme, "bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/10 hover:border-white/20", "bg-white/80 hover:bg-white text-[#1d3fba] border border-[#1d3fba]/15 hover:border-[#1d3fba]/30 shadow-sm")
+                }`}
+                aria-label={lang === "ar" ? "التالي" : "Next"}
+              >
+                <ChevronRight className={`w-5 h-5 ${lang === "ar" ? "rotate-180" : ""}`} />
+              </button>
+            </div>
+
+            {/* Projects Grid */}
+            <motion.div
+              key={projectIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            >
+              {displayedProjects.map((project, idx) => {
+                const Icon = project.icon;
+                return (
+                  <motion.a
+                    key={`${project.title}-${projectIndex}`}
+                    href="#projects"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: idx * 0.1 }}
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    className={`group relative rounded-2xl border backdrop-blur-xl transition-all overflow-hidden shadow-lg ${
+                      tc(theme,
+                        "border-white/15 bg-gradient-to-br from-white/[0.08] to-white/[0.02] hover:border-[#1d3fba]/40 hover:shadow-[#1d3fba]/20",
+                        "border-[#1d3fba]/15 bg-white/70 hover:bg-white hover:border-[#1d3fba]/40 hover:shadow-[#1d3fba]/10"
+                      )
+                    }`}
+                  >
+                    {/* Image or Icon Container */}
+                    <div className={`aspect-[4/3] relative flex items-center justify-center overflow-hidden ${
+                      tc(theme, 
+                        "bg-gradient-to-br from-[#1d3fba]/30 via-[#1d3fba]/15 to-[#1d3fba]/5",
+                        "bg-gradient-to-br from-[#1d3fba]/15 via-[#1d3fba]/8 to-white"
+                      )
+                    }`}>
+                      {project.imageUrl ? (
+                        <img src={project.imageUrl} alt={project.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <>
+                          <div className={`absolute inset-0 ${tc(theme, "bg-gradient-to-br from-[#0a0a0a]/20 to-transparent", "bg-gradient-to-br from-white/50 to-transparent")}`} />
+                          <Icon className={`w-16 h-16 relative z-10 transition-all duration-300 group-hover:scale-110 ${tc(theme, "text-[#4d7aff]", "text-[#1d3fba]")}`} />
+                          <div className={`absolute inset-0 grid-pattern ${tc(theme, "opacity-20", "opacity-10")}`} />
+                          <div className={`absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t ${tc(theme, "from-black/60 to-transparent", "from-white/80 to-transparent")}`} />
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Project Info */}
+                    <div className="p-4 relative">
+                      <div className={`text-xs font-bold mb-2 inline-block px-2 py-0.5 rounded-md ${
+                        tc(theme, "bg-[#1d3fba]/20 text-[#6b9eff]", "bg-[#1d3fba]/10 text-[#1d3fba]")
+                      }`}>
+                        {project.category} • {project.year}
+                      </div>
+                      <h3 className={`text-sm font-bold leading-snug line-clamp-2 ${tc(theme, "text-white", "text-[#0a0a0a]")}`}>
+                        {project.title}
+                      </h3>
+                    </div>
+                    
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <div className={`p-2 rounded-full backdrop-blur-md ${tc(theme, "bg-[#1d3fba]/80", "bg-white/95 shadow-lg")}`}>
+                        <ArrowUpRight className={`w-4 h-4 ${tc(theme, "text-white", "text-[#1d3fba]")}`} />
+                      </div>
+                    </div>
+                  </motion.a>
+                );
+              })}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /* ---------------- Hero ---------------- */
 function Hero({ lang, theme }: { lang: Lang; theme: Theme }) {
   const t = translations[lang].hero;
@@ -480,12 +724,12 @@ function Hero({ lang, theme }: { lang: Lang; theme: Theme }) {
             />
             {/* Logo card */}
             <motion.div
-              className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl border-2 backdrop-blur-xl flex items-center justify-center blue-glow ${tc(theme, "border-[#1d3fba]/40 bg-white/[0.06]", "border-[#1d3fba]/25 bg-white/80")}`}
+              className="relative flex items-center justify-center"
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
               whileHover={{ scale: 1.06 }}
             >
-              <img src={logoSymbol} alt="" className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
+              <img src={theme === "night" ? logoNight : logoDay} alt="" className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 object-contain drop-shadow-2xl" />
             </motion.div>
           </motion.div>
           <motion.div variants={labelAnim} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-xs sm:text-sm mb-6">
@@ -495,6 +739,17 @@ function Hero({ lang, theme }: { lang: Lang; theme: Theme }) {
           <motion.h1 variants={headlineAnim} className={`text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight ${tc(theme, "text-white", "text-[#0b0b0b]")}` }>
             {t.title}
           </motion.h1>
+          
+          {/* Quick Services & Projects Preview - Moved up after title */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-12 mb-8"
+          >
+            <QuickPreview lang={lang} theme={theme} />
+          </motion.div>
+
           <motion.p variants={paraAnim} className={`mt-6 text-base sm:text-lg max-w-3xl mx-auto ${tc(theme, "text-[#e9e9e9]/85", "text-[#3d4451]")}` }>
             {t.sub}
           </motion.p>
@@ -616,8 +871,8 @@ function SectionHeader({
           <span className={tc(theme, "text-white", "text-[#1d3fba]")}>{eyebrow}</span>
         </motion.div>
       )}
-      <motion.h2 variants={blurReveal} className={`text-3xl sm:text-5xl font-extrabold tracking-tight ${tc(theme, "text-white", "text-[#0b0b0b]")}` }>{title}</motion.h2>
-      {subtitle && <motion.p variants={fadeUp} className={`mt-4 ${tc(theme, "text-[#e9e9e9]/80", "text-[#3d4451]")}` }>{subtitle}</motion.p>}
+      <motion.h2 variants={blurReveal} className={`text-3xl sm:text-5xl font-extrabold tracking-tight ${tc(theme, "text-white", "text-[#0b0b0b]")}` } style={theme === "night" ? { textShadow: "0 2px 8px rgba(0,0,0,0.5)" } : {}}>{title}</motion.h2>
+      {subtitle && <motion.p variants={fadeUp} className={`mt-4 ${tc(theme, "text-[#e9e9e9]/90", "text-[#3d4451]")}` } style={theme === "night" ? { textShadow: "0 1px 3px rgba(0,0,0,0.4)" } : {}}>{subtitle}</motion.p>}
     </motion.div>
   );
 }
@@ -860,8 +1115,8 @@ function ServicesSection({ lang, theme, dynServices }: { lang: Lang; theme: Them
                       <Icon className="w-6 h-6 text-[#1d3fba]" />
                     </motion.div>
                   )}
-                  <h3 className={`text-lg font-bold mb-2 ${tc(theme, "text-white", "text-[#111111]")}` }>{s.title}</h3>
-                  <p className={`text-sm leading-relaxed mb-4 ${tc(theme, "text-[#e9e9e9]/70", "text-[#5b6472]")}` }>{s.desc}</p>
+                  <h3 className={`text-lg font-bold mb-2 ${tc(theme, "text-white", "text-[#111111]")}` } style={theme === "night" ? { textShadow: "0 2px 4px rgba(0,0,0,0.4)" } : {}}>{s.title}</h3>
+                  <p className={`text-sm leading-relaxed mb-4 ${tc(theme, "text-[#e9e9e9]/85", "text-[#5b6472]")}` } style={theme === "night" ? { textShadow: "0 1px 2px rgba(0,0,0,0.3)" } : {}}>{s.desc}</p>
                   <ul className="space-y-1.5 mb-5 flex-1">
                     {s.features.map((f) => (
                       <li key={f} className={`text-xs flex items-start gap-2 ${tc(theme, "text-[#e9e9e9]/80", "text-[#3d4451]")}` }>
@@ -941,7 +1196,7 @@ function ProjectsSection({ lang, theme, dynProjects }: { lang: Lang; theme: Them
         {/* Logo badge above heading */}
         <motion.div initial={{ opacity: 0, y: -20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="flex flex-col items-center mb-8">
           <div className="glass-card px-6 py-3 flex items-center gap-3 mb-6 rounded-2xl">
-            <img src={logoSymbol} alt="ABRAJ ALMAS" className="h-10 w-auto" />
+            <img src={theme === "night" ? logoNight : logoDay} alt="ABRAJ ALMAS" className="h-14 w-auto" />
             <div className="text-start">
               <div className={`text-xs font-extrabold tracking-widest ${tc(theme, "text-white", "text-[#0b0b0b]")}` }>ABRAJ ALMAS</div>
               <div className="text-[10px] text-[#1d3fba] font-semibold">{lang === "ar" ? "مشاريع نفخر بها" : "Projects We Are Proud Of"}</div>
@@ -1143,6 +1398,7 @@ function Footer({ lang, theme }: { lang: Lang; theme: Theme }) {
     { label: isAr ? "رؤيتنا"       : "Vision",   href: "#about" },
     { label: isAr ? "الخدمات"      : "Services", href: "#services" },
     { label: isAr ? "الحجز"        : "Booking",  href: "/booking" },
+    { label: isAr ? "الوظائف"      : "Careers",  href: "/jobs" },
     { label: isAr ? "المشاريع"     : "Projects", href: "#projects" },
     { label: isAr ? "الشركاء"      : "Partners", href: "#partners" },
     { label: isAr ? "تواصل معنا"   : "Contact",  href: "#contact" },

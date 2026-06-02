@@ -8,6 +8,7 @@ export const translations = {
       home: "الرئيسية",
       about: "من نحن",
       services: "الخدمات",
+      jobs: "الوظائف",
       booking: "الحجز",
       projects: "المشاريع",
       partners: "الشركاء",
@@ -163,6 +164,81 @@ ${d.projectDescription}
 البريد الإلكتروني: ${d.email}
 طريقة التواصل المفضلة: ${d.preferredContactMethod}`,
     },
+    jobs: {
+      title: "انضم إلى فريق أبراج الماس",
+      subtitle: "نبحث عن الكفاءات والمواهب المتميزة للانضمام إلى فريقنا التقني المتخصص في الشبكات والتكنولوجيا.",
+      intro: "شركة أبراج الماس تتطلع دائماً لتوسيع فريقها بإضافة مهندسين وفنيين ومتخصصين في مجال تكنولوجيا المعلومات والشبكات. إذا كنت تمتلك الخبرة والشغف في هذا المجال، نرحب بك للتقديم والانضمام إلينا.",
+      whyJoin: "لماذا تنضم إلينا؟",
+      benefits: [
+        { title: "بيئة عمل احترافية", text: "فريق عمل متعاون ومشاريع تقنية متنوعة ومتطورة." },
+        { title: "فرص التطور", text: "تدريب مستمر واكتساب خبرات عملية في أحدث التقنيات." },
+        { title: "رواتب تنافسية", text: "نقدم مقابل مادي عادل مع حوافز ومزايا إضافية." },
+        { title: "مشاريع متنوعة", text: "العمل على مشاريع حكومية، تجارية، سكنية، ومؤسسية." },
+      ],
+      openPositions: "الوظائف المتاحة",
+      positions: [
+        { title: "مهندس شبكات", type: "دوام كامل", desc: "خبرة في تصميم وتنفيذ الشبكات LAN/WAN والألياف الضوئية وإعداد المعدات الشبكية." },
+        { title: "فني أنظمة مراقبة", type: "دوام كامل", desc: "خبرة في تركيب وصيانة كاميرات المراقبة وأنظمة IP Camera وNVR/DVR." },
+        { title: "فني جهد منخفض", type: "دوام كامل", desc: "خبرة في أنظمة الجهد المنخفض والأنظمة الضعيفة وإنذار الحريق والصوت المركزي." },
+        { title: "مندوب مبيعات تقني", type: "دوام كامل", desc: "خبرة في المبيعات التقنية وتسويق الحلول والمعدات للشركات والمؤسسات." },
+        { title: "مطور برمجيات", type: "دوام كامل", desc: "خبرة في تطوير أنظمة إدارة المؤسسات والتطبيقات الويب والمحاسبة." },
+      ],
+      applyNow: "قدّم طلبك الآن",
+      formTitle: "نموذج التقديم الوظيفي",
+      labels: {
+        fullName: "الاسم الكامل",
+        email: "البريد الإلكتروني",
+        phone: "رقم الهاتف",
+        whatsapp: "رقم واتساب",
+        position: "الوظيفة المطلوبة",
+        experience: "سنوات الخبرة",
+        education: "المؤهل العلمي",
+        specialization: "التخصص",
+        skills: "المهارات التقنية",
+        cv: "رفع السيرة الذاتية (PDF)",
+        portfolio: "رفع شهادات أو أعمال سابقة (اختياري)",
+        message: "رسالة إضافية",
+        selectedPosition: "الوظيفة المختارة",
+      },
+      educationLevels: ["ثانوية","دبلوم","بكالوريوس","ماجستير","دكتوراه"],
+      experienceYears: ["أقل من سنة","1-3 سنوات","3-5 سنوات","5-10 سنوات","أكثر من 10 سنوات"],
+      submit: "إرسال الطلب",
+      sendWa: "إرسال الطلب",
+      validation: {
+        fullName: "الرجاء إدخال الاسم الكامل.",
+        email: "الرجاء إدخال البريد الإلكتروني.",
+        phone: "الرجاء إدخال رقم الهاتف.",
+        position: "الرجاء اختيار الوظيفة المطلوبة.",
+        experience: "الرجاء تحديد سنوات الخبرة.",
+        education: "الرجاء تحديد المؤهل العلمي.",
+        specialization: "الرجاء إدخال التخصص.",
+        skills: "الرجاء إدخال المهارات التقنية.",
+      },
+      success: {
+        title: "تم استلام طلبك الوظيفي بنجاح",
+        message: "شكراً لاهتمامك بالانضمام إلى فريق أبراج الماس. سنقوم بمراجعة طلبك والتواصل معك في حال تطابق مؤهلاتك مع متطلبات الوظيفة.",
+        backHome: "العودة للرئيسية",
+        another: "تقديم طلب آخر",
+        contactWa: "تواصل بواتساب",
+      },
+      waTemplate: (d: any) => `مرحباً أبراج الماس،
+أود التقديم على وظيفة.
+
+الوظيفة المطلوبة: ${d.position}
+الاسم: ${d.fullName}
+التخصص: ${d.specialization}
+المؤهل العلمي: ${d.education}
+سنوات الخبرة: ${d.experience}
+
+المهارات التقنية:
+${d.skills}
+
+رقم الهاتف: ${d.phone}
+واتساب: ${d.whatsapp}
+البريد الإلكتروني: ${d.email}
+
+${d.message ? 'رسالة إضافية:\n' + d.message : ''}`,
+    },
     projects: {
       title: "أبرز مشاريعنا المنجزة",
       subtitle: "نفتخر بتنفيذ مجموعة مميزة من المشاريع في مجال الشبكات والتكنولوجيا، تعكس خبرتنا وجودة خدماتنا.",
@@ -218,6 +294,7 @@ ${d.projectDescription}
       home: "Home",
       about: "About",
       services: "Services",
+      jobs: "Careers",
       booking: "Booking",
       projects: "Projects",
       partners: "Partners",
@@ -372,6 +449,81 @@ Phone: ${d.phone}
 WhatsApp: ${d.whatsapp}
 Email: ${d.email}
 Preferred Contact Method: ${d.preferredContactMethod}`,
+    },
+    jobs: {
+      title: "Join ABRAJ ALMAS Team",
+      subtitle: "We are looking for distinguished talents and competencies to join our specialized technical team in networks and technology.",
+      intro: "ABRAJ ALMAS is always looking to expand its team by adding engineers, technicians, and specialists in the field of information technology and networks. If you have experience and passion in this field, we welcome you to apply and join us.",
+      whyJoin: "Why Join Us?",
+      benefits: [
+        { title: "Professional Work Environment", text: "Collaborative team and diverse, advanced technical projects." },
+        { title: "Development Opportunities", text: "Continuous training and gaining practical experience in the latest technologies." },
+        { title: "Competitive Salaries", text: "Fair compensation with incentives and additional benefits." },
+        { title: "Diverse Projects", text: "Work on government, commercial, residential, and enterprise projects." },
+      ],
+      openPositions: "Open Positions",
+      positions: [
+        { title: "Network Engineer", type: "Full-time", desc: "Experience in designing and implementing LAN/WAN networks, fiber optics, and network equipment setup." },
+        { title: "CCTV Systems Technician", type: "Full-time", desc: "Experience in installing and maintaining CCTV cameras, IP Camera systems, and NVR/DVR." },
+        { title: "Low-Voltage Technician", type: "Full-time", desc: "Experience in low-voltage systems, low-current systems, fire alarms, and central audio." },
+        { title: "Technical Sales Representative", type: "Full-time", desc: "Experience in technical sales and marketing solutions and equipment to companies and institutions." },
+        { title: "Software Developer", type: "Full-time", desc: "Experience in developing enterprise management systems, web applications, and accounting." },
+      ],
+      applyNow: "Apply Now",
+      formTitle: "Job Application Form",
+      labels: {
+        fullName: "Full Name",
+        email: "Email Address",
+        phone: "Phone Number",
+        whatsapp: "WhatsApp Number",
+        position: "Desired Position",
+        experience: "Years of Experience",
+        education: "Education Level",
+        specialization: "Specialization",
+        skills: "Technical Skills",
+        cv: "Upload Resume (PDF)",
+        portfolio: "Upload Certificates or Previous Work (Optional)",
+        message: "Additional Message",
+        selectedPosition: "Selected Position",
+      },
+      educationLevels: ["High School","Diploma","Bachelor's","Master's","PhD"],
+      experienceYears: ["Less than 1 year","1-3 years","3-5 years","5-10 years","More than 10 years"],
+      submit: "Submit Application",
+      sendWa: "Submit Application",
+      validation: {
+        fullName: "Please enter your full name.",
+        email: "Please enter your email address.",
+        phone: "Please enter your phone number.",
+        position: "Please select the desired position.",
+        experience: "Please select years of experience.",
+        education: "Please select education level.",
+        specialization: "Please enter your specialization.",
+        skills: "Please enter your technical skills.",
+      },
+      success: {
+        title: "Your Job Application Has Been Received",
+        message: "Thank you for your interest in joining ABRAJ ALMAS team. We will review your application and contact you if your qualifications match the job requirements.",
+        backHome: "Back to Home",
+        another: "Submit Another Application",
+        contactWa: "Contact by WhatsApp",
+      },
+      waTemplate: (d: any) => `Hello ABRAJ ALMAS,
+I would like to apply for a position.
+
+Desired Position: ${d.position}
+Name: ${d.fullName}
+Specialization: ${d.specialization}
+Education Level: ${d.education}
+Years of Experience: ${d.experience}
+
+Technical Skills:
+${d.skills}
+
+Phone: ${d.phone}
+WhatsApp: ${d.whatsapp}
+Email: ${d.email}
+
+${d.message ? 'Additional Message:\n' + d.message : ''}`,
     },
     projects: {
       title: "Our Most Prominent Projects",
