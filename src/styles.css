@@ -204,11 +204,29 @@
   100% { transform: translateX(-50%); }
 }
 @keyframes marquee-rtl {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50%); }
 }
 .animate-marquee { animation: marquee 40s linear infinite; }
 .animate-marquee-rtl { animation: marquee-rtl 40s linear infinite; }
+
+/* ── Seamless project marquee ── */
+.proj-marquee-track {
+  display: flex;
+  width: max-content;
+  flex-wrap: nowrap;
+  /* Keep internal flow LTR so translateX(-50%) math stays correct in RTL pages */
+  direction: ltr;
+  will-change: transform;
+  animation: marquee 55s linear infinite;
+}
+.proj-marquee-track.is-rtl {
+  animation-name: marquee-rtl;
+}
+/* Pause on hover anywhere over the marquee viewport */
+.proj-marquee:hover .proj-marquee-track {
+  animation-play-state: paused;
+}
 
 /* Smooth glass-card border/shadow transitions for day↔night */
 .glass-card {

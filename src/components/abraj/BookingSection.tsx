@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Send, MessageCircle, ArrowRight, Sparkles } from "lucide-react";
 import { translations, WA_NUMBER, type Lang } from "./translations";
@@ -6,6 +6,9 @@ import type { Theme } from "./AbrajSite";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 const tc = (theme: Theme, night: string, day: string) => theme === "night" ? night : day;
+
+/** Provides the active theme to the form helper components below. */
+const BookingThemeContext = createContext<Theme>("night");
 
 type BookingData = {
   selectedServices: string[];
@@ -130,6 +133,7 @@ export function BookingSection({ lang, theme, standalone = false }: { lang: Lang
   };
 
   return (
+    <BookingThemeContext.Provider value={theme}>
     <section ref={topRef} id="booking" className={`relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 ${standalone ? "scroll-mt-16" : "scroll-mt-20"}`}>
       <div className="max-w-6xl mx-auto">
         <motion.div
@@ -138,7 +142,7 @@ export function BookingSection({ lang, theme, standalone = false }: { lang: Lang
           viewport={{ once: true, amount: 0.2 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-white text-xs sm:text-sm mb-5">
+          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1d3fba]/40 bg-[#1d3fba]/10 text-xs sm:text-sm mb-5 ${tc(theme, "text-white", "text-[#1d3fba]")}`}>
             <Sparkles className="w-4 h-4" />
             {isAr ? "نظام الحجز" : "Booking System"}
           </div>
@@ -214,7 +218,7 @@ export function BookingSection({ lang, theme, standalone = false }: { lang: Lang
                           <div className="flex items-start gap-3">
                             <div
                               className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center border transition-all ${
-                                selected ? "bg-[#1d3fba] border-[#1d3fba]" : "border-white/20 bg-white/5"
+                                selected ? "bg-[#1d3fba] border-[#1d3fba]" : tc(theme, "border-white/20 bg-white/5", "border-[#1d3fba]/30 bg-[#1d3fba]/5")
                               }`}
                             >
                               {selected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
@@ -265,7 +269,7 @@ export function BookingSection({ lang, theme, standalone = false }: { lang: Lang
                       <Field label={t.labels.upload}>
                         <input
                           type="file"
-                          className="w-full text-sm text-[#e9e9e9] file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1d3fba]/20 file:text-white hover:file:bg-[#1d3fba]/30"
+                          className={`w-full text-sm file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1d3fba]/20 file:text-[#1d3fba] hover:file:bg-[#1d3fba]/30 ${tc(theme, "text-[#e9e9e9]", "text-[#3d4451]")}`}
                         />
                       </Field>
                     </div>
@@ -405,11 +409,13 @@ export function BookingSection({ lang, theme, standalone = false }: { lang: Lang
         </div>
       </div>
     </section>
+    </BookingThemeContext.Provider>
   );
 }
 
 function Field({ label, children, error, theme }: { label: string; children: React.ReactNode; error?: string; theme?: Theme }) {
-  const _theme = theme ?? "night";
+  const ctxTheme = useContext(BookingThemeContext);
+  const _theme = theme ?? ctxTheme;
   return (
     <label className="block">
       <span className={`block text-xs font-semibold uppercase tracking-wider mb-2 ${tc(_theme, "text-white/70", "text-[#3d4451]")}` }>{label}</span>
@@ -420,7 +426,8 @@ function Field({ label, children, error, theme }: { label: string; children: Rea
 }
 
 function Input({ value, onChange, type = "text", dir, theme }: { value: string; onChange: (v: string) => void; type?: string; dir?: "ltr" | "rtl"; theme?: Theme }) {
-  const _theme = theme ?? "night";
+  const ctxTheme = useContext(BookingThemeContext);
+  const _theme = theme ?? ctxTheme;
   return (
     <input
       type={type}
@@ -433,7 +440,8 @@ function Input({ value, onChange, type = "text", dir, theme }: { value: string; 
 }
 
 function Select({ value, onChange, options, placeholder, theme }: { value: string; onChange: (v: string) => void; options: string[]; placeholder: string; theme?: Theme }) {
-  const _theme = theme ?? "night";
+  const ctxTheme = useContext(BookingThemeContext);
+  const _theme = theme ?? ctxTheme;
   return (
     <select
       value={value}
@@ -449,7 +457,8 @@ function Select({ value, onChange, options, placeholder, theme }: { value: strin
 }
 
 function ReviewBlock({ label, children, theme }: { label: string; children: React.ReactNode; theme?: Theme }) {
-  const _theme = theme ?? "night";
+  const ctxTheme = useContext(BookingThemeContext);
+  const _theme = theme ?? ctxTheme;
   return (
     <div className={`rounded-2xl border p-4 ${tc(_theme, "border-white/10 bg-white/[0.02]", "border-[#1d3fba]/15 bg-white/60")}` }>
       <div className={`text-[10px] uppercase tracking-wider mb-1 ${tc(_theme, "text-white/40", "text-[#5b6472]")}` }>{label}</div>

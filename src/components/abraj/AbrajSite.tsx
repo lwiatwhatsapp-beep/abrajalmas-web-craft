@@ -31,7 +31,7 @@ const blurReveal = {
 };
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
-const SERVICE_ICONS = [Network, Wrench, Camera, Cpu, Cable, AppWindow, Compass, Wifi];
+const SERVICE_ICONS = [Network, Wrench, Camera, Cpu, Cable, AppWindow, Compass, Wifi, HomeIcon];
 const WHY_ICONS = [ShieldCheck, Zap, Gem, Headphones, Users];
 const BIZ_ICONS = [Building2, Store, Warehouse, Hotel, School, Landmark, HomeIcon, Server];
 
@@ -739,17 +739,14 @@ function Hero({ lang, theme }: { lang: Lang; theme: Theme }) {
           <motion.h1 variants={headlineAnim} className={`text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight ${tc(theme, "text-white", "text-[#0b0b0b]")}` }>
             {t.title}
           </motion.h1>
-          
-          {/* Quick Services & Projects Preview - Moved up after title */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-12 mb-8"
-          >
-            <QuickPreview lang={lang} theme={theme} />
-          </motion.div>
+        </motion.div>
 
+        {/* Marquees — full width, outside max-w-4xl but inside max-w-7xl */}
+        <ProjectsMarquee lang={lang} theme={theme} />
+        <FeaturedWorkMarquee lang={lang} theme={theme} />
+        <ServicesMarquee lang={lang} theme={theme} />
+
+        <motion.div variants={heroStagger} initial="hidden" animate="visible" className="text-center max-w-4xl mx-auto">
           <motion.p variants={paraAnim} className={`mt-6 text-base sm:text-lg max-w-3xl mx-auto ${tc(theme, "text-[#e9e9e9]/85", "text-[#3d4451]")}` }>
             {t.sub}
           </motion.p>
@@ -777,6 +774,283 @@ function Hero({ lang, theme }: { lang: Lang; theme: Theme }) {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+/* ---------------- Featured Work — seamless infinite marquee ---------------- */
+/** Partner logos — start at project-2 since project-1 (image 1(1)) moved to the projects marquee */
+const PROJECT_IMAGES = Array.from({ length: 12 }, (_, i) => `/assets/projects/project-${i + 2}.png`);
+/** Fallback set (existing assets) to avoid blank cards if primary paths fail */
+const PROJECT_IMAGES_FALLBACK = Array.from({ length: 12 }, (_, i) => `/assets/marquee/proj-${i + 2}.png`);
+
+/** Featured projects: image 1(1) moved from partners + the NEW folder set */
+const FEATURED_PROJECT_IMAGES = [
+  "/assets/projects/project-1.png",
+  ...Array.from({ length: 17 }, (_, i) => `/assets/featured-projects/fp-${i + 1}.png`),
+];
+
+/* ---------------- Featured Projects — seamless infinite marquee ---------------- */
+function ProjectsMarquee({ lang, theme }: { lang: Lang; theme: Theme }) {
+  const isAr = lang === "ar";
+  const [brokenImages, setBrokenImages] = useState<Record<number, boolean>>({});
+  const title = isAr ? "أبرز مشاريعنا" : "Our Featured Projects";
+  const subtitle = isAr
+    ? "لمحة عن مشاريع نفخر بإنجازها في مجال الشبكات والتقنية"
+    : "A glimpse of the networking & technology projects we are proud of";
+
+  // Duplicate the set twice so the -50% translate loops seamlessly with no gap.
+  const cards = [...FEATURED_PROJECT_IMAGES, ...FEATURED_PROJECT_IMAGES];
+
+  // Glassmorphism card styling adapts to the active theme.
+  const cardStyle: React.CSSProperties =
+    theme === "night"
+      ? {
+          background: "rgba(0,0,0,0.4)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+        }
+      : {
+          background: "rgba(255,255,255,0.6)",
+          border: "1px solid rgba(29,63,186,0.10)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          boxShadow: "0 10px 30px rgba(29,63,186,0.10)",
+        };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="mt-10 mb-6"
+    >
+      <div className="text-center mb-7">
+        <h2
+          className={`text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight ${tc(theme, "text-white", "text-[#0b0b0b]")}`}
+          style={theme === "night" ? { textShadow: "0 2px 8px rgba(0,0,0,0.5)" } : {}}
+        >
+          {title}
+        </h2>
+        <p className={`mt-2 text-sm sm:text-base max-w-2xl mx-auto ${tc(theme, "text-[#e9e9e9]/70", "text-[#5b6472]")}`}>
+          {subtitle}
+        </p>
+      </div>
+
+      {/* Marquee viewport — pause on hover handled in CSS via .proj-marquee:hover */}
+      <div className={`proj-marquee relative w-full overflow-hidden py-4 rounded-2xl ${tc(theme, "bg-white/[0.02]", "bg-[#1d3fba]/[0.03]")}`}>
+        <div className={`proj-marquee-track ${isAr ? "is-rtl" : ""}`}>
+          {cards.map((_, i) => {
+            const baseIndex = i % FEATURED_PROJECT_IMAGES.length;
+            const isBroken = !!brokenImages[baseIndex];
+            const src = FEATURED_PROJECT_IMAGES[baseIndex];
+
+            return (
+            <a
+              key={i}
+              href="#projects"
+              aria-hidden={i >= FEATURED_PROJECT_IMAGES.length}
+              className="group relative shrink-0 mr-5 w-[260px] sm:w-[320px] lg:w-[360px] rounded-2xl overflow-hidden p-2 transition-transform duration-300 hover:scale-[1.03] cursor-pointer"
+              style={cardStyle}
+            >
+              <div className="relative w-full h-40 sm:h-48 lg:h-56 rounded-xl overflow-hidden">
+                <img
+                  src={src}
+                  alt={isAr ? "مشروع منجز من أبراج الماس" : "ABRAJ ALMAS completed project"}
+                  loading="lazy"
+                  draggable={false}
+                  onError={() => setBrokenImages((prev) => ({ ...prev, [baseIndex]: true }))}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {isBroken && (
+                  <div className={`absolute inset-0 flex items-center justify-center text-xs font-semibold ${tc(theme, "text-white/75 bg-black/35", "text-[#1d3fba] bg-white/45")}`}>
+                    {isAr ? "صورة المشروع غير متاحة" : "Project image unavailable"}
+                  </div>
+                )}
+                <div
+                  className={`absolute inset-0 pointer-events-none bg-gradient-to-t ${tc(theme, "from-black/40 via-transparent to-transparent", "from-white/30 via-transparent to-transparent")}`}
+                />
+              </div>
+            </a>
+          )})}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function FeaturedWorkMarquee({ lang, theme }: { lang: Lang; theme: Theme }) {
+  const isAr = lang === "ar";
+  const [brokenImages, setBrokenImages] = useState<Record<number, boolean>>({});
+  const title = isAr ? "أبرز شركاؤنا" : "Our Top Partners";
+  const subtitle = isAr
+    ? "العلامات والشركاء الذين نعمل معهم في مشاريعنا التقنية"
+    : "The brands and partners we work with across our technical projects";
+
+  // Duplicate the set twice so the -50% translate loops seamlessly with no gap.
+  const cards = [...PROJECT_IMAGES, ...PROJECT_IMAGES];
+
+  // Glassmorphism card styling adapts to the active theme.
+  const cardStyle: React.CSSProperties =
+    theme === "night"
+      ? {
+          background: "rgba(0,0,0,0.4)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+        }
+      : {
+          background: "rgba(255,255,255,0.6)",
+          border: "1px solid rgba(29,63,186,0.10)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          boxShadow: "0 10px 30px rgba(29,63,186,0.10)",
+        };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="mt-10 mb-6"
+    >
+      <div className="text-center mb-7">
+        <h2
+          className={`text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight ${tc(theme, "text-white", "text-[#0b0b0b]")}`}
+          style={theme === "night" ? { textShadow: "0 2px 8px rgba(0,0,0,0.5)" } : {}}
+        >
+          {title}
+        </h2>
+        <p className={`mt-2 text-sm sm:text-base max-w-2xl mx-auto ${tc(theme, "text-[#e9e9e9]/70", "text-[#5b6472]")}`}>
+          {subtitle}
+        </p>
+      </div>
+
+      {/* Marquee viewport — pause on hover handled in CSS via .proj-marquee:hover */}
+      <div className={`proj-marquee relative w-full overflow-hidden py-4 rounded-2xl ${tc(theme, "bg-white/[0.02]", "bg-[#1d3fba]/[0.03]")}`}>
+        <div className={`proj-marquee-track ${isAr ? "is-rtl" : ""}`}>
+          {cards.map((_, i) => {
+            const baseIndex = i % PROJECT_IMAGES.length;
+            const isBroken = !!brokenImages[baseIndex];
+            const src = isBroken ? PROJECT_IMAGES_FALLBACK[baseIndex] : PROJECT_IMAGES[baseIndex];
+
+            return (
+            <a
+              key={i}
+              href="#partners"
+              aria-hidden={i >= PROJECT_IMAGES.length}
+              className="group relative shrink-0 mr-5 w-[260px] sm:w-[320px] lg:w-[360px] rounded-2xl overflow-hidden p-2 transition-transform duration-300 hover:scale-[1.03] cursor-pointer"
+              style={cardStyle}
+            >
+              <div className="relative w-full h-40 sm:h-48 lg:h-56 rounded-xl overflow-hidden">
+                <img
+                  src={src}
+                  alt={isAr ? "شعار شريك من أبراج الماس" : "ABRAJ ALMAS partner logo"}
+                  loading="lazy"
+                  draggable={false}
+                  onError={() => setBrokenImages((prev) => ({ ...prev, [baseIndex]: true }))}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {isBroken && (
+                  <div className={`absolute inset-0 flex items-center justify-center text-xs font-semibold ${tc(theme, "text-white/75 bg-black/35", "text-[#1d3fba] bg-white/45")}`}>
+                    {isAr ? "صورة الشريك غير متاحة" : "Partner image unavailable"}
+                  </div>
+                )}
+                <div
+                  className={`absolute inset-0 pointer-events-none bg-gradient-to-t ${tc(theme, "from-black/40 via-transparent to-transparent", "from-white/30 via-transparent to-transparent")}`}
+                />
+              </div>
+            </a>
+          )})}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ---------------- Our Services — seamless infinite glass marquee ---------------- */
+function ServicesMarquee({ lang, theme }: { lang: Lang; theme: Theme }) {
+  const isAr = lang === "ar";
+  const title = isAr ? "خدماتنا" : "Our Services";
+  const subtitle = isAr
+    ? "حلولنا التقنية الأساسية التي نقدمها للأفراد والشركات"
+    : "Our core technical services for individuals and businesses";
+  const serviceTitles = translations[lang].services.items.map((item) => item.title);
+  const cards = [...serviceTitles, ...serviceTitles];
+
+  // Clear glass card tinted with the brand blue (#1d3fba), tuned per theme.
+  const cardStyle: React.CSSProperties =
+    theme === "night"
+      ? {
+          background: "linear-gradient(135deg, rgba(29,63,186,0.16) 0%, rgba(10,10,12,0.55) 100%)",
+          border: "1px solid rgba(29,63,186,0.35)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)",
+        }
+      : {
+          background: "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(29,63,186,0.08) 100%)",
+          border: "1px solid rgba(29,63,186,0.22)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          boxShadow: "0 10px 30px rgba(29,63,186,0.14), inset 0 1px 0 rgba(255,255,255,0.7)",
+        };
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      className="pb-8 px-4 sm:px-6 lg:px-8"
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-6">
+          <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight ${tc(theme, "text-white", "text-[#0b0b0b]")}`}>
+            {title}
+          </h2>
+          <p className={`mt-2 text-sm sm:text-base max-w-2xl mx-auto ${tc(theme, "text-[#e9e9e9]/70", "text-[#5b6472]")}`}>
+            {subtitle}
+          </p>
+        </div>
+
+        <div className={`proj-marquee relative w-full overflow-hidden py-4 rounded-2xl ${tc(theme, "bg-white/[0.02]", "bg-[#1d3fba]/[0.03]")}`}>
+          <div className={`proj-marquee-track ${isAr ? "is-rtl" : ""}`}>
+            {cards.map((service, i) => {
+              const Icon = SERVICE_ICONS[i % serviceTitles.length] || Network;
+              return (
+                <a
+                  key={`${service}-${i}`}
+                  href="/booking"
+                  aria-hidden={i >= serviceTitles.length}
+                  className="group relative shrink-0 mr-5 w-[280px] sm:w-[330px] lg:w-[380px] rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(29,63,186,0.35)] cursor-pointer"
+                  style={cardStyle}
+                >
+                  {/* Brand accent bar */}
+                  <span className="absolute inset-y-0 start-0 w-1 bg-[#1d3fba]" />
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border transition-all duration-300 group-hover:scale-110"
+                      style={{
+                        background: theme === "night" ? "rgba(29,63,186,0.22)" : "rgba(29,63,186,0.12)",
+                        borderColor: "rgba(29,63,186,0.45)",
+                      }}
+                    >
+                      <Icon className={`w-6 h-6 ${tc(theme, "text-[#6b9eff]", "text-[#1d3fba]")}`} />
+                    </div>
+                    <p className={`text-sm sm:text-base font-bold leading-snug ${tc(theme, "text-white", "text-[#0b0b0b]")}`}>
+                      {service}
+                    </p>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </motion.section>
   );
 }
 

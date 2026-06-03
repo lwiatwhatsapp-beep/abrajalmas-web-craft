@@ -260,7 +260,7 @@ function JobsPage() {
           >
             {/* Hero Section */}
             <motion.div variants={fadeUp} className="text-center max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6 ${tc(theme, 'border-white/15 bg-white/[0.05]', 'border-[#1d3fba]/20 bg-[#1d3fba]/5')}">
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6 ${tc(theme, "border-white/15 bg-white/[0.05]", "border-[#1d3fba]/20 bg-[#1d3fba]/5")}`}>
                 <Briefcase className="w-4 h-4 text-[#1d3fba]" />
                 <span className={`text-sm font-semibold ${tc(theme, "text-[#6b9eff]", "text-[#1d3fba]")}`}>
                   {isAr ? "نحن نوظف" : "We're Hiring"}
