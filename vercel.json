@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "NITRO_PRESET=vercel npx vite build",
+  "buildCommand": "NITRO_PRESET=vercel npx nitro build",
   "outputDirectory": ".vercel/output",
   "framework": null
 }
